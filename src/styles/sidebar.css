@@ -1,0 +1,265 @@
+.sidebar {
+  width: var(--sidebar-width);
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  background: var(--sidebar);
+}
+
+.sidebar-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.sidebar-section.projects {
+  flex: 0 1 auto;
+  max-height: 46%;
+}
+
+.sidebar-section.refs {
+  flex: 1 1 0;
+  border-top: 1px solid var(--line);
+}
+
+.sidebar-section.projects:only-child {
+  max-height: none;
+  flex: 1 1 auto;
+}
+
+.sidebar-header {
+  flex: none;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  height: 34px;
+  padding: 0 8px 0 14px;
+  font-size: 10.5px;
+  font-weight: 650;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.sidebar-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0 6px 10px;
+}
+
+.sidebar-note {
+  margin: 4px 8px;
+  font-size: var(--text-sm);
+  color: var(--text-faint);
+}
+
+.sidebar-note.indent {
+  margin-left: 30px;
+}
+
+.sidebar-row {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  width: 100%;
+  min-height: 26px;
+  padding: 0 6px;
+  border-radius: var(--radius-md);
+  text-align: left;
+  color: var(--text);
+  font-size: var(--text-md);
+}
+
+.sidebar-row:hover:not(:disabled) {
+  background: var(--hover);
+}
+
+.sidebar-row:disabled {
+  opacity: 0.5;
+}
+
+.row-icon {
+  flex: none;
+  color: var(--text-muted);
+}
+
+.row-icon.accent {
+  color: var(--accent);
+}
+
+.row-icon.warn {
+  color: var(--warn);
+}
+
+.row-trailing {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  padding-left: 4px;
+}
+
+.small-text {
+  font-size: var(--text-xs);
+}
+
+.chevron {
+  flex: none;
+  color: var(--text-faint);
+  transition: transform 0.12s var(--ease);
+}
+
+.chevron.open {
+  transform: rotate(90deg);
+}
+
+.project-row {
+  margin-top: 2px;
+  padding-left: 2px;
+  gap: 2px;
+}
+
+.project-row .disclosure {
+  width: 18px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 4px;
+}
+
+.project-label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  min-width: 0;
+  height: 26px;
+  flex: 1;
+  text-align: left;
+}
+
+.project-name {
+  font-weight: 600;
+}
+
+.project-row.unavailable .project-name {
+  color: var(--text-muted);
+}
+
+.worktree-row {
+  padding: 4px 6px 4px 26px;
+  min-height: 38px;
+  margin: 1px 0;
+}
+
+.worktree-row.selected {
+  background: var(--selection);
+}
+
+.worktree-row.selected:hover {
+  background: var(--selection-strong);
+}
+
+.worktree-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+  line-height: 1.25;
+}
+
+.worktree-name {
+  font-size: var(--text-md);
+}
+
+.worktree-row.selected .worktree-name {
+  font-weight: 600;
+}
+
+.worktree-branch {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.sync-counts {
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.ref-section {
+  margin-top: 2px;
+}
+
+.ref-section-header {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  width: 100%;
+  height: 26px;
+  padding: 0 6px;
+  border-radius: var(--radius-md);
+  font-size: var(--text-sm);
+  font-weight: 600;
+  color: var(--text-muted);
+}
+
+.ref-section-header:hover {
+  background: var(--hover);
+}
+
+.ref-section-header .faint {
+  margin-left: auto;
+  font-weight: 500;
+  font-size: var(--text-xs);
+}
+
+.ref-row,
+.folder-row {
+  height: 26px;
+  min-height: 26px;
+  gap: 6px;
+}
+
+.ref-row.head .ref-name {
+  font-weight: 600;
+}
+
+.ref-row .ref-name {
+  flex: 0 1 auto;
+}
+
+.ref-subject {
+  flex: 1 1 0;
+}
+
+.ref-row.stash .ref-name {
+  flex: none;
+}
+
+.filter-toggle {
+  opacity: 0;
+}
+
+.sidebar-row:hover .filter-toggle,
+.sidebar-row:focus-within .filter-toggle,
+.filter-toggle.on {
+  opacity: 1;
+}
+
+.sidebar-row.filtered {
+  background: var(--accent-softer);
+}
+
+.elsewhere {
+  display: inline-flex;
+  color: var(--text-faint);
+}
+
+.filter-indicator {
+  display: inline-flex;
+  color: var(--accent);
+}

@@ -1,0 +1,254 @@
+{
+  "actions": [
+    {
+      "type": "stage",
+      "file": {
+        "path": "src/a.ts",
+        "kind": "unstaged",
+        "status": "M",
+        "conflict": null
+      }
+    },
+    {
+      "type": "unstage",
+      "file": {
+        "path": "src/a.ts",
+        "kind": "staged",
+        "status": "A",
+        "conflict": null
+      }
+    },
+    {
+      "type": "discard",
+      "file": {
+        "path": "notes.txt",
+        "kind": "untracked",
+        "status": "?",
+        "conflict": null
+      }
+    },
+    {
+      "type": "applyLines",
+      "file": {
+        "path": "src/a.ts",
+        "kind": "unstaged",
+        "status": "M",
+        "conflict": null
+      },
+      "source": "@@ -1 +1 @@\n-a\n+b\n",
+      "lines": [1, 2],
+      "operation": "stage"
+    },
+    {
+      "type": "applyLines",
+      "file": {
+        "path": "src/a.ts",
+        "kind": "staged",
+        "status": "M",
+        "conflict": null
+      },
+      "source": "@@ -1 +1 @@\n-a\n+b\n",
+      "lines": [2],
+      "operation": "unstage"
+    },
+    {
+      "type": "applyLines",
+      "file": {
+        "path": "src/a.ts",
+        "kind": "unstaged",
+        "status": "M",
+        "conflict": null
+      },
+      "source": "@@ -1 +1 @@\n-a\n+b\n",
+      "lines": [1],
+      "operation": "discard"
+    },
+    {
+      "type": "commit",
+      "message": "Fix the login redirect"
+    },
+    {
+      "type": "createBranch",
+      "name": "feature/new"
+    },
+    {
+      "type": "switchBranch",
+      "reference": "refs/heads/main"
+    },
+    {
+      "type": "checkoutRemote",
+      "reference": "refs/remotes/origin/fix/login"
+    },
+    {
+      "type": "renameBranch",
+      "reference": "refs/heads/fix/login",
+      "name": "fix/sign-in"
+    },
+    {
+      "type": "deleteBranch",
+      "reference": "refs/heads/old",
+      "force": false
+    },
+    {
+      "type": "deleteBranch",
+      "reference": "refs/heads/old",
+      "force": true
+    },
+    {
+      "type": "merge",
+      "reference": "refs/heads/side"
+    },
+    {
+      "type": "rebase",
+      "reference": "refs/heads/main"
+    },
+    {
+      "type": "abort",
+      "operation": "merge"
+    },
+    {
+      "type": "abort",
+      "operation": "rebase"
+    },
+    {
+      "type": "addWorktree",
+      "reference": "refs/heads/side",
+      "parent": null,
+      "name": "sample-side"
+    },
+    {
+      "type": "stash",
+      "message": ""
+    },
+    {
+      "type": "applyStash",
+      "stash": "stash@{0}",
+      "revision": "0123456789abcdef0123456789abcdef01234567"
+    },
+    {
+      "type": "dropStash",
+      "stash": "stash@{1}",
+      "revision": "0123456789abcdef0123456789abcdef01234567"
+    },
+    {
+      "type": "fetch"
+    },
+    {
+      "type": "pull"
+    },
+    {
+      "type": "push"
+    },
+    {
+      "type": "continue",
+      "operation": "merge",
+      "message": "Merge branch 'side'"
+    },
+    {
+      "type": "continue",
+      "operation": "rebase",
+      "message": null
+    },
+    {
+      "type": "abort",
+      "operation": "cherryPick"
+    },
+    {
+      "type": "abort",
+      "operation": "revert"
+    },
+    {
+      "type": "resolveSide",
+      "file": {
+        "path": "README.md",
+        "kind": "unstaged",
+        "status": "U",
+        "conflict": "bothModified"
+      },
+      "side": "ours"
+    },
+    {
+      "type": "resolveSide",
+      "file": {
+        "path": "README.md",
+        "kind": "unstaged",
+        "status": "U",
+        "conflict": "bothModified"
+      },
+      "side": "theirs"
+    },
+    {
+      "type": "keepFile",
+      "file": {
+        "path": "README.md",
+        "kind": "unstaged",
+        "status": "U",
+        "conflict": "deletedByThem"
+      }
+    },
+    {
+      "type": "deleteFile",
+      "file": {
+        "path": "README.md",
+        "kind": "unstaged",
+        "status": "U",
+        "conflict": "deletedByUs"
+      }
+    },
+    {
+      "type": "markResolved",
+      "file": {
+        "path": "README.md",
+        "kind": "unstaged",
+        "status": "U",
+        "conflict": "bothModified"
+      },
+      "force": false
+    },
+    {
+      "type": "saveResolution",
+      "file": {
+        "path": "README.md",
+        "kind": "unstaged",
+        "status": "U",
+        "conflict": "bothModified"
+      },
+      "fingerprint": "cbf29ce484222325-0",
+      "choices": ["ours", "theirs", "oursThenTheirs", "theirsThenOurs"]
+    },
+    {
+      "type": "addWorktree",
+      "reference": "refs/heads/side",
+      "parent": "parent-1",
+      "name": "side"
+    }
+  ],
+  "files": [
+    {
+      "path": "src/a.ts",
+      "kind": "committed",
+      "status": "D",
+      "conflict": null
+    },
+    {
+      "path": "dir/new [file].txt",
+      "kind": "untracked",
+      "status": "?",
+      "conflict": null
+    },
+    {
+      "path": "README.md",
+      "kind": "unstaged",
+      "status": "U",
+      "conflict": "bothModified"
+    }
+  ],
+  "ui": {
+    "diffLayout": "split",
+    "ignoreWhitespace": true,
+    "sidebarWidth": 280,
+    "historySplit": 0.5,
+    "changesSplit": 0.42,
+    "lastWorktree": null
+  }
+}

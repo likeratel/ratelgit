@@ -1,0 +1,1022 @@
+{
+  "add_project": [
+    {
+      "projects": [
+        {
+          "name": "sample",
+          "path": "/work/sample",
+          "reason": null,
+          "state": "ready",
+          "worktrees": [
+            {
+              "ahead": 3,
+              "behind": 0,
+              "branch": "main",
+              "changes": 3,
+              "isMain": true,
+              "name": "sample",
+              "path": "/work/sample",
+              "unavailable": false
+            },
+            {
+              "ahead": null,
+              "behind": null,
+              "branch": "fix/login",
+              "changes": 1,
+              "isMain": false,
+              "name": "sample-login",
+              "path": "/work/sample-login",
+              "unavailable": false
+            }
+          ]
+        }
+      ],
+      "worktree": "/work/sample"
+    },
+    null
+  ],
+  "choose_worktree_parent": [
+    {
+      "path": "/work",
+      "token": "parent-1"
+    },
+    null
+  ],
+  "error": {
+    "kind": "not_fully_merged",
+    "message": "error: the branch 'feature/x/y' is not fully merged.\nIf you are sure you want to delete it, run 'git branch -D feature/x/y'"
+  },
+  "get_bootstrap": [
+    {
+      "platform": "windows",
+      "preferences": {
+        "filters": {},
+        "projects": [],
+        "ui": {
+          "changesSplit": 0.4,
+          "diffLayout": "unified",
+          "historySplit": 0.55,
+          "ignoreWhitespace": false,
+          "lastWorktree": null,
+          "sidebarWidth": 272
+        },
+        "version": 1
+      }
+    },
+    {
+      "platform": "macos",
+      "preferences": {
+        "filters": {
+          "/work/sample": [
+            "refs/heads/fix/login"
+          ]
+        },
+        "projects": [
+          "/work/sample",
+          "/work/missing"
+        ],
+        "ui": {
+          "changesSplit": 0.4,
+          "diffLayout": "unified",
+          "historySplit": 0.55,
+          "ignoreWhitespace": false,
+          "lastWorktree": "/work/sample",
+          "sidebarWidth": 272
+        },
+        "version": 1
+      }
+    }
+  ],
+  "list_projects": [
+    {
+      "name": "sample",
+      "path": "/work/sample",
+      "reason": null,
+      "state": "ready",
+      "worktrees": [
+        {
+          "ahead": 3,
+          "behind": 0,
+          "branch": "main",
+          "changes": 3,
+          "isMain": true,
+          "name": "sample",
+          "path": "/work/sample",
+          "unavailable": false
+        },
+        {
+          "ahead": null,
+          "behind": null,
+          "branch": "fix/login",
+          "changes": 1,
+          "isMain": false,
+          "name": "sample-login",
+          "path": "/work/sample-login",
+          "unavailable": false
+        }
+      ]
+    },
+    {
+      "name": "missing",
+      "path": "/work/missing",
+      "reason": "Folder not found",
+      "state": "unavailable",
+      "worktrees": []
+    }
+  ],
+  "list_worktrees": [
+    {
+      "ahead": 3,
+      "behind": 0,
+      "branch": "main",
+      "changes": 3,
+      "isMain": true,
+      "name": "sample",
+      "path": "/work/sample",
+      "unavailable": false
+    },
+    {
+      "ahead": null,
+      "behind": null,
+      "branch": "fix/login",
+      "changes": 1,
+      "isMain": false,
+      "name": "sample-login",
+      "path": "/work/sample-login",
+      "unavailable": false
+    }
+  ],
+  "load_commit": {
+    "detail": {
+      "author": "RatelGit Test",
+      "date": "2026-02-26T10:43:20+00:00",
+      "email": "test@example.invalid",
+      "hash": "c63eaac630528115cb6b13339141ab1c1febeac8",
+      "message": "Merge branch 'side'",
+      "parents": [
+        "8bb178aa9d12032eb8041666930fb06814f29dd4",
+        "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad"
+      ]
+    },
+    "files": [
+      {
+        "conflict": null,
+        "kind": "committed",
+        "path": "side.txt",
+        "status": "A"
+      }
+    ]
+  },
+  "load_conflict": [
+    {
+      "fingerprint": "b96490f49f1eb475-51",
+      "path": "README.md",
+      "reason": null,
+      "segments": [
+        {
+          "base": null,
+          "baseLabel": null,
+          "ours": [
+            "# Login\n"
+          ],
+          "oursLabel": "HEAD",
+          "theirs": [
+            "# Clash\n"
+          ],
+          "theirsLabel": "clash",
+          "type": "conflict"
+        }
+      ],
+      "state": "ready"
+    }
+  ],
+  "load_diff": {
+    "lossy": false,
+    "text": "diff --git a/src/app.ts b/src/app.ts\nindex 6392506..e1b898c 100644\n--- a/src/app.ts\n+++ b/src/app.ts\n@@ -1 +1 @@\n-let value = 2\n+let value = 3\n",
+    "truncated": false
+  },
+  "load_history": {
+    "complete": false,
+    "lines": [
+      {
+        "author": "RatelGit Test",
+        "date": "2026-02-27",
+        "hash": "792ca8d9a69a303b174025ef7af9edfc5a844875",
+        "index": 2,
+        "parents": [
+          "c63eaac630528115cb6b13339141ab1c1febeac8"
+        ],
+        "refs": [
+          "clash"
+        ],
+        "shortHash": "792ca8d",
+        "subject": "Edit readme on clash",
+        "timestamp": 1772199800
+      },
+      {
+        "author": "RatelGit Test",
+        "date": "2026-02-26",
+        "hash": "3eb89b67692b1145197a9802236ae1ce5d0cc6df",
+        "index": 3,
+        "parents": [
+          "b996326d1f50bcc2ed4cfdade21da3899e83c4da"
+        ],
+        "refs": [
+          "feature/x/y"
+        ],
+        "shortHash": "3eb89b6",
+        "subject": "Extend nested feature",
+        "timestamp": 1772140400
+      },
+      {
+        "author": "RatelGit Test",
+        "date": "2026-02-26",
+        "hash": "b996326d1f50bcc2ed4cfdade21da3899e83c4da",
+        "index": 4,
+        "parents": [
+          "c63eaac630528115cb6b13339141ab1c1febeac8"
+        ],
+        "refs": [
+          "origin/feature/x/y"
+        ],
+        "shortHash": "b996326",
+        "subject": "Start nested feature",
+        "timestamp": 1772124200
+      }
+    ]
+  },
+  "load_worktree": [
+    {
+      "files": [
+        {
+          "conflict": null,
+          "kind": "staged",
+          "path": "README.md",
+          "status": "M"
+        },
+        {
+          "conflict": null,
+          "kind": "unstaged",
+          "path": "src/app.ts",
+          "status": "M"
+        },
+        {
+          "conflict": null,
+          "kind": "untracked",
+          "path": "new.txt",
+          "status": "?"
+        }
+      ],
+      "filter": [],
+      "headHidden": false,
+      "history": {
+        "complete": true,
+        "lines": [
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-27",
+            "hash": "820d9c4fd111d10c0a1c60a86192302c7af1ba7e",
+            "index": 0,
+            "parents": [
+              "5d09f265c7aff1f2a684f329977c00bec48602cb"
+            ],
+            "refs": [
+              "fix/login"
+            ],
+            "shortHash": "820d9c4",
+            "subject": "Edit readme on login",
+            "timestamp": 1772216000
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-27",
+            "hash": "5d09f265c7aff1f2a684f329977c00bec48602cb",
+            "index": 1,
+            "parents": [
+              "c63eaac630528115cb6b13339141ab1c1febeac8"
+            ],
+            "refs": [],
+            "shortHash": "5d09f26",
+            "subject": "Fix login redirect",
+            "timestamp": 1772156600
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-27",
+            "hash": "792ca8d9a69a303b174025ef7af9edfc5a844875",
+            "index": 2,
+            "parents": [
+              "c63eaac630528115cb6b13339141ab1c1febeac8"
+            ],
+            "refs": [
+              "clash"
+            ],
+            "shortHash": "792ca8d",
+            "subject": "Edit readme on clash",
+            "timestamp": 1772199800
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "3eb89b67692b1145197a9802236ae1ce5d0cc6df",
+            "index": 3,
+            "parents": [
+              "b996326d1f50bcc2ed4cfdade21da3899e83c4da"
+            ],
+            "refs": [
+              "feature/x/y"
+            ],
+            "shortHash": "3eb89b6",
+            "subject": "Extend nested feature",
+            "timestamp": 1772140400
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "b996326d1f50bcc2ed4cfdade21da3899e83c4da",
+            "index": 4,
+            "parents": [
+              "c63eaac630528115cb6b13339141ab1c1febeac8"
+            ],
+            "refs": [
+              "origin/feature/x/y"
+            ],
+            "shortHash": "b996326",
+            "subject": "Start nested feature",
+            "timestamp": 1772124200
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "c63eaac630528115cb6b13339141ab1c1febeac8",
+            "index": 5,
+            "parents": [
+              "8bb178aa9d12032eb8041666930fb06814f29dd4",
+              "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad"
+            ],
+            "refs": [
+              "HEAD -> main",
+              "tag: v1.0"
+            ],
+            "shortHash": "c63eaac",
+            "subject": "Merge branch 'side'",
+            "timestamp": 1772102600
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad",
+            "index": 6,
+            "parents": [
+              "41ec393259bf2702d7115f0cd49c449eafde6f5e"
+            ],
+            "refs": [
+              "side"
+            ],
+            "shortHash": "4e8d1ba",
+            "subject": "Add side notes",
+            "timestamp": 1772081000
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "8bb178aa9d12032eb8041666930fb06814f29dd4",
+            "index": 7,
+            "parents": [
+              "41ec393259bf2702d7115f0cd49c449eafde6f5e"
+            ],
+            "refs": [],
+            "shortHash": "8bb178a",
+            "subject": "Bump the value",
+            "timestamp": 1772097200
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-25",
+            "hash": "41ec393259bf2702d7115f0cd49c449eafde6f5e",
+            "index": 8,
+            "parents": [
+              "13623abd11fbd89e623a1ea667b806f5ca52afae"
+            ],
+            "refs": [
+              "origin/main"
+            ],
+            "shortHash": "41ec393",
+            "subject": "Add app entry point",
+            "timestamp": 1772059400
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-25",
+            "hash": "13623abd11fbd89e623a1ea667b806f5ca52afae",
+            "index": 9,
+            "parents": [],
+            "refs": [],
+            "shortHash": "13623ab",
+            "subject": "Initial commit",
+            "timestamp": 1772048600
+          }
+        ]
+      },
+      "operation": null,
+      "references": [
+        {
+          "id": "refs/heads/clash",
+          "isHead": false,
+          "kind": "local",
+          "name": "clash",
+          "subject": null,
+          "target": "792ca8d9a69a303b174025ef7af9edfc5a844875",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/heads/feature/x/y",
+          "isHead": false,
+          "kind": "local",
+          "name": "feature/x/y",
+          "subject": null,
+          "target": "3eb89b67692b1145197a9802236ae1ce5d0cc6df",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/heads/fix/login",
+          "isHead": false,
+          "kind": "local",
+          "name": "fix/login",
+          "subject": null,
+          "target": "820d9c4fd111d10c0a1c60a86192302c7af1ba7e",
+          "worktreePath": "/work/sample-login"
+        },
+        {
+          "id": "refs/heads/main",
+          "isHead": true,
+          "kind": "local",
+          "name": "main",
+          "subject": null,
+          "target": "c63eaac630528115cb6b13339141ab1c1febeac8",
+          "worktreePath": "/work/sample"
+        },
+        {
+          "id": "refs/heads/side",
+          "isHead": false,
+          "kind": "local",
+          "name": "side",
+          "subject": null,
+          "target": "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/remotes/origin/feature/x/y",
+          "isHead": false,
+          "kind": "remote",
+          "name": "origin/feature/x/y",
+          "subject": null,
+          "target": "b996326d1f50bcc2ed4cfdade21da3899e83c4da",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/remotes/origin/main",
+          "isHead": false,
+          "kind": "remote",
+          "name": "origin/main",
+          "subject": null,
+          "target": "41ec393259bf2702d7115f0cd49c449eafde6f5e",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/tags/v1.0",
+          "isHead": false,
+          "kind": "tag",
+          "name": "v1.0",
+          "subject": null,
+          "target": "c63eaac630528115cb6b13339141ab1c1febeac8",
+          "worktreePath": null
+        },
+        {
+          "id": "stash@{0}",
+          "isHead": false,
+          "kind": "stash",
+          "name": "stash@{0}",
+          "subject": "On main: Draft notes",
+          "target": "145f89df85ad887e5cfdf75d3c8fdfeb9b9b291a",
+          "worktreePath": null
+        }
+      ],
+      "tracking": {
+        "ahead": 3,
+        "behind": 0,
+        "branch": "main",
+        "remote": "origin",
+        "target": "refs/heads/main"
+      }
+    },
+    {
+      "files": [
+        {
+          "conflict": null,
+          "kind": "staged",
+          "path": "README.md",
+          "status": "M"
+        },
+        {
+          "conflict": null,
+          "kind": "unstaged",
+          "path": "src/app.ts",
+          "status": "M"
+        },
+        {
+          "conflict": null,
+          "kind": "untracked",
+          "path": "new.txt",
+          "status": "?"
+        }
+      ],
+      "filter": [
+        "refs/heads/fix/login"
+      ],
+      "headHidden": false,
+      "history": {
+        "complete": true,
+        "lines": [
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-27",
+            "hash": "820d9c4fd111d10c0a1c60a86192302c7af1ba7e",
+            "index": 0,
+            "parents": [
+              "5d09f265c7aff1f2a684f329977c00bec48602cb"
+            ],
+            "refs": [
+              "fix/login"
+            ],
+            "shortHash": "820d9c4",
+            "subject": "Edit readme on login",
+            "timestamp": 1772216000
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-27",
+            "hash": "5d09f265c7aff1f2a684f329977c00bec48602cb",
+            "index": 1,
+            "parents": [
+              "c63eaac630528115cb6b13339141ab1c1febeac8"
+            ],
+            "refs": [],
+            "shortHash": "5d09f26",
+            "subject": "Fix login redirect",
+            "timestamp": 1772156600
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "c63eaac630528115cb6b13339141ab1c1febeac8",
+            "index": 2,
+            "parents": [
+              "8bb178aa9d12032eb8041666930fb06814f29dd4",
+              "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad"
+            ],
+            "refs": [
+              "HEAD -> main",
+              "tag: v1.0"
+            ],
+            "shortHash": "c63eaac",
+            "subject": "Merge branch 'side'",
+            "timestamp": 1772102600
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad",
+            "index": 3,
+            "parents": [
+              "41ec393259bf2702d7115f0cd49c449eafde6f5e"
+            ],
+            "refs": [
+              "side"
+            ],
+            "shortHash": "4e8d1ba",
+            "subject": "Add side notes",
+            "timestamp": 1772081000
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "8bb178aa9d12032eb8041666930fb06814f29dd4",
+            "index": 4,
+            "parents": [
+              "41ec393259bf2702d7115f0cd49c449eafde6f5e"
+            ],
+            "refs": [],
+            "shortHash": "8bb178a",
+            "subject": "Bump the value",
+            "timestamp": 1772097200
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-25",
+            "hash": "41ec393259bf2702d7115f0cd49c449eafde6f5e",
+            "index": 5,
+            "parents": [
+              "13623abd11fbd89e623a1ea667b806f5ca52afae"
+            ],
+            "refs": [
+              "origin/main"
+            ],
+            "shortHash": "41ec393",
+            "subject": "Add app entry point",
+            "timestamp": 1772059400
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-25",
+            "hash": "13623abd11fbd89e623a1ea667b806f5ca52afae",
+            "index": 6,
+            "parents": [],
+            "refs": [],
+            "shortHash": "13623ab",
+            "subject": "Initial commit",
+            "timestamp": 1772048600
+          }
+        ]
+      },
+      "operation": null,
+      "references": [
+        {
+          "id": "refs/heads/clash",
+          "isHead": false,
+          "kind": "local",
+          "name": "clash",
+          "subject": null,
+          "target": "792ca8d9a69a303b174025ef7af9edfc5a844875",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/heads/feature/x/y",
+          "isHead": false,
+          "kind": "local",
+          "name": "feature/x/y",
+          "subject": null,
+          "target": "3eb89b67692b1145197a9802236ae1ce5d0cc6df",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/heads/fix/login",
+          "isHead": false,
+          "kind": "local",
+          "name": "fix/login",
+          "subject": null,
+          "target": "820d9c4fd111d10c0a1c60a86192302c7af1ba7e",
+          "worktreePath": "/work/sample-login"
+        },
+        {
+          "id": "refs/heads/main",
+          "isHead": true,
+          "kind": "local",
+          "name": "main",
+          "subject": null,
+          "target": "c63eaac630528115cb6b13339141ab1c1febeac8",
+          "worktreePath": "/work/sample"
+        },
+        {
+          "id": "refs/heads/side",
+          "isHead": false,
+          "kind": "local",
+          "name": "side",
+          "subject": null,
+          "target": "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/remotes/origin/feature/x/y",
+          "isHead": false,
+          "kind": "remote",
+          "name": "origin/feature/x/y",
+          "subject": null,
+          "target": "b996326d1f50bcc2ed4cfdade21da3899e83c4da",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/remotes/origin/main",
+          "isHead": false,
+          "kind": "remote",
+          "name": "origin/main",
+          "subject": null,
+          "target": "41ec393259bf2702d7115f0cd49c449eafde6f5e",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/tags/v1.0",
+          "isHead": false,
+          "kind": "tag",
+          "name": "v1.0",
+          "subject": null,
+          "target": "c63eaac630528115cb6b13339141ab1c1febeac8",
+          "worktreePath": null
+        },
+        {
+          "id": "stash@{0}",
+          "isHead": false,
+          "kind": "stash",
+          "name": "stash@{0}",
+          "subject": "On main: Draft notes",
+          "target": "145f89df85ad887e5cfdf75d3c8fdfeb9b9b291a",
+          "worktreePath": null
+        }
+      ],
+      "tracking": {
+        "ahead": 3,
+        "behind": 0,
+        "branch": "main",
+        "remote": "origin",
+        "target": "refs/heads/main"
+      }
+    },
+    {
+      "files": [
+        {
+          "conflict": "bothModified",
+          "kind": "unstaged",
+          "path": "README.md",
+          "status": "U"
+        }
+      ],
+      "filter": [],
+      "headHidden": false,
+      "history": {
+        "complete": true,
+        "lines": [
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-27",
+            "hash": "820d9c4fd111d10c0a1c60a86192302c7af1ba7e",
+            "index": 0,
+            "parents": [
+              "5d09f265c7aff1f2a684f329977c00bec48602cb"
+            ],
+            "refs": [
+              "HEAD -> fix/login"
+            ],
+            "shortHash": "820d9c4",
+            "subject": "Edit readme on login",
+            "timestamp": 1772216000
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-27",
+            "hash": "5d09f265c7aff1f2a684f329977c00bec48602cb",
+            "index": 1,
+            "parents": [
+              "c63eaac630528115cb6b13339141ab1c1febeac8"
+            ],
+            "refs": [],
+            "shortHash": "5d09f26",
+            "subject": "Fix login redirect",
+            "timestamp": 1772156600
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-27",
+            "hash": "792ca8d9a69a303b174025ef7af9edfc5a844875",
+            "index": 2,
+            "parents": [
+              "c63eaac630528115cb6b13339141ab1c1febeac8"
+            ],
+            "refs": [
+              "clash"
+            ],
+            "shortHash": "792ca8d",
+            "subject": "Edit readme on clash",
+            "timestamp": 1772199800
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "3eb89b67692b1145197a9802236ae1ce5d0cc6df",
+            "index": 3,
+            "parents": [
+              "b996326d1f50bcc2ed4cfdade21da3899e83c4da"
+            ],
+            "refs": [
+              "feature/x/y"
+            ],
+            "shortHash": "3eb89b6",
+            "subject": "Extend nested feature",
+            "timestamp": 1772140400
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "b996326d1f50bcc2ed4cfdade21da3899e83c4da",
+            "index": 4,
+            "parents": [
+              "c63eaac630528115cb6b13339141ab1c1febeac8"
+            ],
+            "refs": [
+              "origin/feature/x/y"
+            ],
+            "shortHash": "b996326",
+            "subject": "Start nested feature",
+            "timestamp": 1772124200
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "c63eaac630528115cb6b13339141ab1c1febeac8",
+            "index": 5,
+            "parents": [
+              "8bb178aa9d12032eb8041666930fb06814f29dd4",
+              "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad"
+            ],
+            "refs": [
+              "tag: v1.0",
+              "main"
+            ],
+            "shortHash": "c63eaac",
+            "subject": "Merge branch 'side'",
+            "timestamp": 1772102600
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad",
+            "index": 6,
+            "parents": [
+              "41ec393259bf2702d7115f0cd49c449eafde6f5e"
+            ],
+            "refs": [
+              "side"
+            ],
+            "shortHash": "4e8d1ba",
+            "subject": "Add side notes",
+            "timestamp": 1772081000
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-26",
+            "hash": "8bb178aa9d12032eb8041666930fb06814f29dd4",
+            "index": 7,
+            "parents": [
+              "41ec393259bf2702d7115f0cd49c449eafde6f5e"
+            ],
+            "refs": [],
+            "shortHash": "8bb178a",
+            "subject": "Bump the value",
+            "timestamp": 1772097200
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-25",
+            "hash": "41ec393259bf2702d7115f0cd49c449eafde6f5e",
+            "index": 8,
+            "parents": [
+              "13623abd11fbd89e623a1ea667b806f5ca52afae"
+            ],
+            "refs": [
+              "origin/main"
+            ],
+            "shortHash": "41ec393",
+            "subject": "Add app entry point",
+            "timestamp": 1772059400
+          },
+          {
+            "author": "RatelGit Test",
+            "date": "2026-02-25",
+            "hash": "13623abd11fbd89e623a1ea667b806f5ca52afae",
+            "index": 9,
+            "parents": [],
+            "refs": [],
+            "shortHash": "13623ab",
+            "subject": "Initial commit",
+            "timestamp": 1772048600
+          }
+        ]
+      },
+      "operation": {
+        "branch": null,
+        "conflicts": 1,
+        "kind": "merge",
+        "message": "Merge branch 'clash' into fix/login",
+        "ours": "fix/login",
+        "step": null,
+        "theirs": "clash",
+        "total": null
+      },
+      "references": [
+        {
+          "id": "refs/heads/clash",
+          "isHead": false,
+          "kind": "local",
+          "name": "clash",
+          "subject": null,
+          "target": "792ca8d9a69a303b174025ef7af9edfc5a844875",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/heads/feature/x/y",
+          "isHead": false,
+          "kind": "local",
+          "name": "feature/x/y",
+          "subject": null,
+          "target": "3eb89b67692b1145197a9802236ae1ce5d0cc6df",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/heads/fix/login",
+          "isHead": true,
+          "kind": "local",
+          "name": "fix/login",
+          "subject": null,
+          "target": "820d9c4fd111d10c0a1c60a86192302c7af1ba7e",
+          "worktreePath": "/work/sample-login"
+        },
+        {
+          "id": "refs/heads/main",
+          "isHead": false,
+          "kind": "local",
+          "name": "main",
+          "subject": null,
+          "target": "c63eaac630528115cb6b13339141ab1c1febeac8",
+          "worktreePath": "/work/sample"
+        },
+        {
+          "id": "refs/heads/side",
+          "isHead": false,
+          "kind": "local",
+          "name": "side",
+          "subject": null,
+          "target": "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/remotes/origin/feature/x/y",
+          "isHead": false,
+          "kind": "remote",
+          "name": "origin/feature/x/y",
+          "subject": null,
+          "target": "b996326d1f50bcc2ed4cfdade21da3899e83c4da",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/remotes/origin/main",
+          "isHead": false,
+          "kind": "remote",
+          "name": "origin/main",
+          "subject": null,
+          "target": "41ec393259bf2702d7115f0cd49c449eafde6f5e",
+          "worktreePath": null
+        },
+        {
+          "id": "refs/tags/v1.0",
+          "isHead": false,
+          "kind": "tag",
+          "name": "v1.0",
+          "subject": null,
+          "target": "c63eaac630528115cb6b13339141ab1c1febeac8",
+          "worktreePath": null
+        },
+        {
+          "id": "stash@{0}",
+          "isHead": false,
+          "kind": "stash",
+          "name": "stash@{0}",
+          "subject": "On main: Draft notes",
+          "target": "145f89df85ad887e5cfdf75d3c8fdfeb9b9b291a",
+          "worktreePath": null
+        }
+      ],
+      "tracking": null
+    }
+  ],
+  "open_file": [
+    {
+      "action": "opened"
+    },
+    {
+      "action": "revealed"
+    }
+  ],
+  "remove_project": [
+    "/work/sample"
+  ],
+  "run_action": null,
+  "save_preferences": {
+    "filters": {
+      "/work/sample": [
+        "refs/heads/fix/login"
+      ]
+    },
+    "projects": [
+      "/work/sample",
+      "/work/missing"
+    ],
+    "ui": {
+      "changesSplit": 0.4,
+      "diffLayout": "unified",
+      "historySplit": 0.55,
+      "ignoreWhitespace": false,
+      "lastWorktree": "/work/sample",
+      "sidebarWidth": 272
+    },
+    "version": 1
+  }
+}

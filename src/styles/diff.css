@@ -1,0 +1,256 @@
+.diff-view {
+  flex: 1;
+  min-width: 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  background: var(--surface);
+}
+
+.diff-header {
+  flex: none;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 12px;
+  min-height: var(--pane-header);
+  padding: 6px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.diff-file {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+  flex: 1 1 180px;
+}
+
+.diff-file-name {
+  font-weight: 600;
+  flex: none;
+  max-width: 60%;
+}
+
+.diff-file-path {
+  font-size: var(--text-xs);
+  direction: rtl;
+  text-align: left;
+}
+
+.diff-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: none;
+  margin-left: auto;
+}
+
+.diff-options {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 6px;
+}
+
+.selection-bar {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 5px 12px;
+  background: var(--accent-softer);
+  border-bottom: 1px solid var(--line);
+  font-size: var(--text-sm);
+}
+
+.selection-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+.diff-notice {
+  flex: none;
+  padding: 6px 12px;
+  font-size: var(--text-sm);
+  background: var(--warn-soft);
+  border-bottom: 1px solid var(--line);
+}
+
+.diff-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  position: relative;
+}
+
+.diff-canvas {
+  position: relative;
+  width: 100%;
+  font-size: 12px;
+  line-height: 20px;
+}
+
+.diff-slot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+}
+
+.diff-row {
+  display: flex;
+  align-items: stretch;
+  height: 100%;
+  white-space: pre;
+}
+
+.diff-row.added,
+.diff-cell.added {
+  background: var(--diff-add);
+}
+
+.diff-row.removed,
+.diff-cell.removed {
+  background: var(--diff-del);
+}
+
+.diff-row.selected.added,
+.diff-cell.selected.added {
+  background: var(--diff-add-strong);
+}
+
+.diff-row.selected.removed,
+.diff-cell.selected.removed {
+  background: var(--diff-del-strong);
+}
+
+.diff-num {
+  flex: none;
+  width: 46px;
+  padding-right: 8px;
+  text-align: right;
+  color: var(--text-faint);
+  background: var(--diff-gutter);
+  user-select: none;
+}
+
+.diff-row.added .diff-num,
+.diff-row.removed .diff-num,
+.diff-cell.added .diff-num,
+.diff-cell.removed .diff-num {
+  background: transparent;
+}
+
+.diff-sign {
+  flex: none;
+  width: 18px;
+  text-align: center;
+  color: var(--text-faint);
+  user-select: none;
+}
+
+.diff-row.added .diff-sign {
+  color: var(--ok);
+}
+
+.diff-row.removed .diff-sign {
+  color: var(--danger);
+}
+
+.diff-text {
+  padding: 0 10px 0 2px;
+  user-select: text;
+}
+
+.diff-text mark.word {
+  color: inherit;
+  border-radius: 2px;
+}
+
+.added mark.word {
+  background: var(--diff-add-strong);
+}
+
+.removed mark.word {
+  background: var(--diff-del-strong);
+}
+
+.diff-row.hunk {
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  background: var(--diff-hunk);
+  color: var(--text-muted);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+}
+
+.diff-row.hunk.note {
+  background: transparent;
+  border: 0;
+}
+
+.diff-slot:first-child .diff-row.hunk {
+  border-top: 0;
+}
+
+.diff-hunk-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.hunk-button {
+  font-family: var(--font-ui);
+  height: 20px;
+}
+
+.diff-select {
+  flex: none;
+  width: 22px;
+  display: grid;
+  place-items: center;
+}
+
+.diff-select.box::before {
+  content: "";
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  border: 1.5px solid var(--text-faint);
+  opacity: 0.55;
+  transition: opacity 0.1s;
+}
+
+.diff-row:hover .diff-select.box::before,
+.diff-cell:hover .diff-select.box::before {
+  opacity: 1;
+}
+
+.diff-select.box.on::before {
+  opacity: 1;
+  border-color: var(--accent);
+  background: var(--accent)
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath d='M2.5 6.2l2.3 2.3 4.7-5' fill='none' stroke='white' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E")
+    center / 10px no-repeat;
+}
+
+.split-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+}
+
+.diff-cell {
+  display: flex;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.diff-cell + .diff-cell {
+  border-left: 1px solid var(--line);
+}
+
+.diff-cell.empty-cell {
+  background: var(--diff-empty);
+}

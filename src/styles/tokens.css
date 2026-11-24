@@ -1,0 +1,153 @@
+/* Design tokens. Light by default; the system dark appearance switches the palette. */
+:root {
+  color-scheme: light dark;
+
+  --bg: #f6f7f9;
+  --sidebar: #eef0f3;
+  --surface: #ffffff;
+  --surface-sunken: #f3f4f7;
+  --hover: rgba(20, 30, 50, 0.055);
+  --hover-strong: rgba(20, 30, 50, 0.09);
+  --line: #e3e6eb;
+  --line-strong: #cfd4dc;
+
+  --text: #1b1f27;
+  --text-muted: #5b6474;
+  --text-faint: #8f98a8;
+
+  --accent: #2f6fed;
+  --accent-text: #2058cc;
+  --accent-soft: rgba(47, 111, 237, 0.1);
+  --accent-softer: rgba(47, 111, 237, 0.06);
+  --selection: rgba(47, 111, 237, 0.14);
+  --selection-strong: rgba(47, 111, 237, 0.22);
+  --focus-ring: rgba(47, 111, 237, 0.55);
+  --on-accent: #ffffff;
+
+  --ok: #1d9a63;
+  --ok-soft: rgba(29, 154, 99, 0.12);
+  --warn: #b86e00;
+  --warn-soft: rgba(229, 145, 20, 0.14);
+  --danger: #d23f3f;
+  --danger-soft: rgba(210, 63, 63, 0.1);
+  --tag: #8a6200;
+  --tag-soft: rgba(230, 170, 20, 0.2);
+
+  --diff-add: rgba(46, 160, 67, 0.12);
+  --diff-add-strong: rgba(46, 160, 67, 0.32);
+  --diff-del: rgba(220, 60, 60, 0.11);
+  --diff-del-strong: rgba(220, 60, 60, 0.3);
+  --diff-hunk: rgba(47, 111, 237, 0.07);
+  --diff-gutter: #f7f8fa;
+  --diff-empty: repeating-linear-gradient(
+    135deg,
+    transparent 0 4px,
+    rgba(20, 30, 50, 0.035) 4px 8px
+  );
+
+  --ours: #2f6fed;
+  --ours-soft: rgba(47, 111, 237, 0.09);
+  --theirs: #8b47d8;
+  --theirs-soft: rgba(139, 71, 216, 0.09);
+
+  --graph-0: #2f6fed;
+  --graph-1: #e8890c;
+  --graph-2: #1d9a63;
+  --graph-3: #d6457f;
+  --graph-4: #8b47d8;
+  --graph-5: #1393a3;
+  --graph-6: #d23f3f;
+  --graph-7: #5257d6;
+  --graph-8: #9a6a2c;
+  --graph-9: #4aa83a;
+
+  --font-ui:
+    -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI Variable Text",
+    "Segoe UI", system-ui, "Apple SD Gothic Neo", "Malgun Gothic", sans-serif;
+  --font-mono:
+    ui-monospace, "SF Mono", SFMono-Regular, Menlo, "Cascadia Mono", Consolas,
+    "D2Coding", monospace;
+
+  --text-xs: 11px;
+  --text-sm: 12px;
+  --text-md: 13px;
+  --text-lg: 15px;
+
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 10px;
+
+  --row: 28px;
+  --control: 26px;
+  --header: 52px;
+  --pane-header: 38px;
+
+  --shadow-pop:
+    0 10px 30px rgba(20, 30, 50, 0.16), 0 0 0 1px rgba(20, 30, 50, 0.08);
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #17191d;
+    --sidebar: #1c1f24;
+    --surface: #1f2228;
+    --surface-sunken: #1a1c21;
+    --hover: rgba(255, 255, 255, 0.05);
+    --hover-strong: rgba(255, 255, 255, 0.085);
+    --line: #2c3038;
+    --line-strong: #3a3f49;
+
+    --text: #e5e8ee;
+    --text-muted: #9ba3b1;
+    --text-faint: #6b7381;
+
+    --accent: #5b8ef7;
+    --accent-text: #86aaff;
+    --accent-soft: rgba(91, 142, 247, 0.16);
+    --accent-softer: rgba(91, 142, 247, 0.08);
+    --selection: rgba(91, 142, 247, 0.2);
+    --selection-strong: rgba(91, 142, 247, 0.3);
+    --focus-ring: rgba(120, 160, 255, 0.65);
+
+    --ok: #4cc38a;
+    --ok-soft: rgba(76, 195, 138, 0.15);
+    --warn: #f0a83a;
+    --warn-soft: rgba(240, 168, 58, 0.15);
+    --danger: #f06a6a;
+    --danger-soft: rgba(240, 106, 106, 0.14);
+    --tag: #e8c15a;
+    --tag-soft: rgba(232, 193, 90, 0.16);
+
+    --diff-add: rgba(70, 190, 100, 0.13);
+    --diff-add-strong: rgba(70, 190, 100, 0.33);
+    --diff-del: rgba(240, 90, 90, 0.13);
+    --diff-del-strong: rgba(240, 90, 90, 0.33);
+    --diff-hunk: rgba(91, 142, 247, 0.1);
+    --diff-gutter: #1c1f24;
+    --diff-empty: repeating-linear-gradient(
+      135deg,
+      transparent 0 4px,
+      rgba(255, 255, 255, 0.03) 4px 8px
+    );
+
+    --ours: #6f9bff;
+    --ours-soft: rgba(111, 155, 255, 0.12);
+    --theirs: #b98af0;
+    --theirs-soft: rgba(185, 138, 240, 0.12);
+
+    --graph-0: #5b8ef7;
+    --graph-1: #f0a83a;
+    --graph-2: #4cc38a;
+    --graph-3: #ee6fa3;
+    --graph-4: #b183ef;
+    --graph-5: #3cc2cf;
+    --graph-6: #f06a6a;
+    --graph-7: #8a8ff5;
+    --graph-8: #c99a5b;
+    --graph-9: #7fd06e;
+
+    --shadow-pop:
+      0 14px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  }
+}
