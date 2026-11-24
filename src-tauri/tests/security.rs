@@ -3,18 +3,15 @@
 
 mod common;
 
-use std::path::{Path, PathBuf};
-
 use common::*;
 use ratelgit_lib::error::ErrorKind;
-use ratelgit_lib::git::{ChangeKind, ChangedFile, Git, OpenDecision, Scope};
+use ratelgit_lib::git::{ChangeKind, ChangedFile, Git, OpenDecision};
 use ratelgit_lib::projects::Registry;
-use ratelgit_lib::snapshot;
 use ratelgit_lib::store::Store;
 
 /// A script that creates `marker` when run.
 #[cfg(unix)]
-fn trap(dir: &Path, marker: &Path) -> PathBuf {
+fn trap(dir: &std::path::Path, marker: &std::path::Path) -> std::path::PathBuf {
     use std::os::unix::fs::PermissionsExt;
     let script = dir.join("trap.sh");
     std::fs::write(
@@ -26,7 +23,11 @@ fn trap(dir: &Path, marker: &Path) -> PathBuf {
     script
 }
 
+/// The traps are shell scripts, so the tests that read everything only run on Unix.
+#[cfg(unix)]
 fn read_everything(client: &Git) {
+    use ratelgit_lib::git::Scope;
+    use ratelgit_lib::snapshot;
     let snapshot = snapshot::load(client, &[]).unwrap();
     for line in snapshot.history.lines.iter().take(3) {
         let _ = client.commit_detail(&line.hash);
