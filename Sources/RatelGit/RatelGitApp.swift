@@ -41,4 +41,7 @@ enum Layout {
     static let sidebar: (min: CGFloat, ideal: CGFloat, max: CGFloat) = (220, 260, 380)
     static let center: (min: CGFloat, ideal: CGFloat) = (380, 640)
     static let inspector: (min: CGFloat, ideal: CGFloat) = (400, 560)
+    static let historyList: (min: CGFloat, ideal: CGFloat) = (170, 380)
+    static let commitDetail: (min: CGFloat, ideal: CGFloat) = (230, 360)
+    static let commitSummary: (min: CGFloat, ideal: CGFloat) = (320, 430)
 }

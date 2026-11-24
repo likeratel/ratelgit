@@ -38,33 +38,35 @@ struct RepositoryView: View {
                 WorkspaceHeader(model: model)
                 Divider()
                 if let operation = model.operation { OperationBanner(operation: operation, model: model) }
-                HSplitView {
-                    center
-                        .frame(minWidth: Layout.center.min, idealWidth: Layout.center.ideal,
-                               maxWidth: .infinity, maxHeight: .infinity)
-                    inspector
-                        .frame(minWidth: Layout.inspector.min, idealWidth: Layout.inspector.ideal,
-                               maxWidth: .infinity, maxHeight: .infinity)
-                }
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .disabled(model.mutation != nil)
+                panes
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .disabled(model.mutation != nil)
             }
         }
     }
 
+    /// History stacks the commit list above the commit detail; Changes keeps the file list beside the diff.
     @ViewBuilder
-    private var center: some View {
+    private var panes: some View {
         switch model.mode {
-        case .history: HistoryView(model: model)
-        case .changes: ChangesView(model: model)
-        }
-    }
-
-    @ViewBuilder
-    private var inspector: some View {
-        switch model.mode {
-        case .history: CommitInspector(model: model)
-        case .changes: DiffPane(model: model)
+        case .history:
+            VSplitView {
+                HistoryView(model: model)
+                    .frame(maxWidth: .infinity, minHeight: Layout.historyList.min, idealHeight: Layout.historyList.ideal,
+                           maxHeight: .infinity)
+                CommitInspector(model: model)
+                    .frame(maxWidth: .infinity, minHeight: Layout.commitDetail.min, idealHeight: Layout.commitDetail.ideal,
+                           maxHeight: .infinity)
+            }
+        case .changes:
+            HSplitView {
+                ChangesView(model: model)
+                    .frame(minWidth: Layout.center.min, idealWidth: Layout.center.ideal,
+                           maxWidth: .infinity, maxHeight: .infinity)
+                DiffPane(model: model)
+                    .frame(minWidth: Layout.inspector.min, idealWidth: Layout.inspector.ideal,
+                           maxWidth: .infinity, maxHeight: .infinity)
+            }
         }
     }
 

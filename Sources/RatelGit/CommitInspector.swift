@@ -1,7 +1,7 @@
 import SwiftUI
 import RatelGitCore
 
-/// Right side of History: the selected commit's message and metadata, its files, and the file diff.
+/// Bottom of History: the selected commit's message and metadata, its files, and the file diff.
 struct CommitInspector: View {
     @ObservedObject var model: BrowserModel
 
@@ -11,7 +11,7 @@ struct CommitInspector: View {
                                    description: Text("Choose a commit to read its message, changed files and diff."))
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
         } else {
-            VSplitView {
+            HSplitView {
                 VStack(spacing: 0) {
                     if let detail = model.detail {
                         CommitSummary(detail: detail, model: model)
@@ -21,9 +21,10 @@ struct CommitInspector: View {
                     Divider()
                     files
                 }
-                .frame(minHeight: 200, idealHeight: 290, maxHeight: .infinity)
+                .frame(minWidth: Layout.commitSummary.min, idealWidth: Layout.commitSummary.ideal,
+                       maxWidth: .infinity, maxHeight: .infinity)
                 DiffPane(model: model, allowsStaging: false)
-                    .frame(minHeight: 220, maxHeight: .infinity)
+                    .frame(minWidth: Layout.inspector.min, maxWidth: .infinity, maxHeight: .infinity)
             }
             .frame(maxWidth: .infinity, maxHeight: .infinity)
         }
