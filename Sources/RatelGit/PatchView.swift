@@ -2,149 +2,34 @@ import AppKit
 import SwiftUI
 import RatelGitCore
 
-struct PatchLine: Equatable {
-    enum Kind { case context, added, removed, header }
-    let text: String
-    let old: Int?
-    let new: Int?
-    let kind: Kind
-}
-
-struct PatchRow: Identifiable {
-    let id: Int
-    let left: PatchLine?
-    let right: PatchLine?
-}
-
-struct PatchDocument {
-    let lines: [PatchLine]
-    private static let hunk = #/^@@ -([0-9]+)(?:,[0-9]+)? \+([0-9]+)(?:,[0-9]+)? @@/#
-
-    init(_ patch: String) {
-        var old: Int?
-        var new: Int?
-        lines = patch.split(separator: "\n", omittingEmptySubsequences: false).dropLast(patch.hasSuffix("\n") ? 1 : 0)
-            .map { line in
-                if let match = line.prefixMatch(of: Self.hunk) {
-                    old = Int(match.1)
-                    new = Int(match.2)
-                } else if let previous = old, let current = new {
-                    let text = String(line.dropFirst())
-                    switch line.first {
-                    case " ":
-                        old = previous + 1
-                        new = current + 1
-                        return PatchLine(text: text, old: previous, new: current, kind: .context)
-                    case "+":
-                        new = current + 1
-                        return PatchLine(text: text, old: nil, new: current, kind: .added)
-                    case "-":
-                        old = previous + 1
-                        return PatchLine(text: text, old: previous, new: nil, kind: .removed)
-                    default: break
-                    }
-                }
-                return PatchLine(text: String(line), old: nil, new: nil, kind: .header)
-            }
-    }
-
-    var splitRows: [PatchRow] {
-        var result: [PatchRow] = []
-        var left: [PatchLine] = []
-        var right: [PatchLine] = []
-        func appendChanges() {
-            for index in 0..<max(left.count, right.count) {
-                result.append(PatchRow(id: result.count, left: left.indices.contains(index) ? left[index] : nil,
-                                       right: right.indices.contains(index) ? right[index] : nil))
-            }
-            left.removeAll(keepingCapacity: true)
-            right.removeAll(keepingCapacity: true)
-        }
-        for line in lines {
-            switch line.kind {
-            case .removed: left.append(line)
-            case .added: right.append(line)
-            case .header, .context:
-                appendChanges()
-                result.append(PatchRow(id: result.count, left: line, right: line.kind == .context ? line : nil))
-            }
-        }
-        appendChanges()
-        return result
-    }
-}
-
-struct DiffInspector: View {
-    @ObservedObject var model: BrowserModel
-    let includeFiles: Bool
-    @State private var split = false
-
-    var body: some View {
-        VSplitView {
-            if includeFiles {
-                VStack(alignment: .leading, spacing: 0) {
-                    Text(model.commit.map { "Commit \($0.prefix(8))" } ?? "Working Changes")
-                        .font(.headline).padding(12)
-                    Divider()
-                    if model.files.isEmpty {
-                        ContentUnavailableView("No changed files", systemImage: "doc")
-                            .frame(maxWidth: .infinity, maxHeight: .infinity)
-                    } else {
-                        List(model.files) { file in FileRow(file: file, model: model) }.listStyle(.inset)
-                    }
-                }
-                .frame(minHeight: 110, idealHeight: 155)
-            }
-            VStack(alignment: .leading, spacing: 0) {
-                HStack {
-                    Text(model.file?.path ?? "Diff").font(.headline)
-                        .lineLimit(1).truncationMode(.middle)
-                    Spacer()
-                    Picker("Diff layout", selection: $split) {
-                        Text("Unified").tag(false)
-                        Text("Split").tag(true)
-                    }
-                    .pickerStyle(.segmented).labelsHidden().fixedSize()
-                }
-                .padding(12)
-                Divider()
-                if model.patch.isEmpty {
-                    ContentUnavailableView(model.file == nil ? "Select a file" : model.loading ? "Reading diff…" : "No text diff",
-                                           systemImage: "doc.text.magnifyingglass")
-                        .frame(maxWidth: .infinity, maxHeight: .infinity)
-                } else {
-                    PatchView(patch: model.patch, split: split).id(model.file)
-                }
-            }
-            .frame(minHeight: 220, maxHeight: .infinity, alignment: .top)
-        }
-    }
+/// Hunk and line actions offered for a working-tree diff.
+struct LineStaging {
+    let operations: [LineOperation]
+    let selection: Set<Int>
+    let toggle: (Int) -> Void
+    /// Runs an operation on a whole hunk, identified by its header line index.
+    let hunk: (LineOperation, Int) -> Void
 }
 
 struct PatchView: View {
-    let patch: String
+    let document: PatchDocument
     let split: Bool
+    var staging: LineStaging?
     private static let codeSize: CGFloat = 12
+    private static let rowHeight: CGFloat = 20
+    private static let gutterWidth: CGFloat = 37
+    private static let selectorWidth: CGFloat = 18
+    private static let tabReplacement = "    "
 
     var body: some View {
-        let document = PatchDocument(patch)
         GeometryReader { geometry in
             ScrollView([.vertical, .horizontal]) {
                 LazyVStack(alignment: .leading, spacing: 0) {
                     if split {
-                        let width = max(geometry.size.width, (longestLine(in: document) + 56) * 2)
+                        let width = max(geometry.size.width, (longestLine + 56 + selectorSpace) * 2)
                         ForEach(document.splitRows) { row in splitRow(row, width: width) }
                     } else {
-                        ForEach(Array(document.lines.enumerated()), id: \.offset) { _, line in
-                            HStack(spacing: 0) {
-                                gutter(line.old)
-                                gutter(line.new)
-                                Text(prefix(line) + line.text).padding(.horizontal, 6)
-                                Spacer(minLength: 0)
-                            }
-                            .frame(minWidth: geometry.size.width, minHeight: 20)
-                            .background(tint(line.kind))
-                        }
+                        ForEach(document.displayLines, id: \.index) { line in unifiedRow(line, width: geometry.size.width) }
                     }
                 }
                 .font(.system(size: Self.codeSize, design: .monospaced))
@@ -153,22 +38,59 @@ struct PatchView: View {
         }
     }
 
-    private func longestLine(in document: PatchDocument) -> CGFloat {
+    private var selectorSpace: CGFloat { staging == nil ? 0 : Self.selectorWidth }
+
+    private var longestLine: CGFloat {
         let font = NSFont.monospacedSystemFont(ofSize: Self.codeSize, weight: .regular)
         return document.lines.lazy.filter { $0.kind != .header }.map { line in
-            let text = line.text.replacingOccurrences(of: "\t", with: "    ")
+            let text = line.text.replacingOccurrences(of: "\t", with: Self.tabReplacement)
             return (text as NSString).size(withAttributes: [.font: font]).width.rounded(.up)
         }.max() ?? 0
     }
 
     @ViewBuilder
+    private func unifiedRow(_ line: PatchLine, width: CGFloat) -> some View {
+        if line.kind == .header {
+            headerRow(line, width: width)
+        } else {
+            HStack(spacing: 0) {
+                selector(line)
+                gutter(line.old)
+                gutter(line.new)
+                Text(Self.styled(prefix(line), line)).lineLimit(1).fixedSize().padding(.horizontal, 6)
+                Spacer(minLength: 0)
+            }
+            .frame(minWidth: width, minHeight: Self.rowHeight)
+            .background(tint(line))
+        }
+    }
+
+    private func headerRow(_ line: PatchLine, width: CGFloat) -> some View {
+        HStack(spacing: 8) {
+            Text(line.text).foregroundStyle(.secondary).lineLimit(1).fixedSize()
+            if line.isHunkHeader, let staging {
+                ForEach(staging.operations, id: \.self) { operation in
+                    Button(operation == .discard ? "Discard Hunk…" : "\(operation.rawValue) Hunk") {
+                        staging.hunk(operation, line.index)
+                    }
+                    .font(.system(size: 11)).controlSize(.mini)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(.horizontal, 8)
+        .frame(minWidth: width, minHeight: line.isHunkHeader && staging != nil ? 26 : Self.rowHeight, alignment: .leading)
+        .background(Color.blue.opacity(0.09))
+    }
+
+    @ViewBuilder
     private func splitRow(_ row: PatchRow, width: CGFloat) -> some View {
         if let line = row.left, line.kind == .header {
-            Text(line.text).padding(.horizontal, 8).frame(minWidth: width, minHeight: 20, alignment: .leading)
-                .background(tint(.header))
+            headerRow(line, width: width)
         } else {
             HStack(spacing: 0) {
                 cell(row.left, number: row.left?.old, width: width / 2)
+                Divider()
                 cell(row.right, number: row.right?.new, width: width / 2)
             }
         }
@@ -176,17 +98,38 @@ struct PatchView: View {
 
     private func cell(_ line: PatchLine?, number: Int?, width: CGFloat) -> some View {
         HStack(spacing: 0) {
+            if let line { selector(line) } else if staging != nil { Color.clear.frame(width: Self.selectorWidth) }
             gutter(number)
-            Text(line?.text.replacingOccurrences(of: "\t", with: "    ") ?? "").lineLimit(1).fixedSize().padding(.horizontal, 6)
+            Text(line.map { Self.styled("", $0) } ?? AttributedString()).lineLimit(1).fixedSize().padding(.horizontal, 6)
             Spacer(minLength: 0)
         }
-        .frame(width: width, height: 20)
-        .background(tint(line?.kind))
+        .frame(width: width, height: Self.rowHeight)
+        .background(line.map(tint) ?? Color.secondary.opacity(0.08))
+    }
+
+    @ViewBuilder
+    private func selector(_ line: PatchLine) -> some View {
+        if let staging {
+            if line.isChange {
+                let selected = staging.selection.contains(line.index)
+                Button { staging.toggle(line.index) } label: {
+                    Image(systemName: selected ? "checkmark.square.fill" : "square")
+                        .font(.system(size: 10))
+                        .foregroundStyle(selected ? Color.accentColor : Color.secondary.opacity(0.6))
+                        .frame(width: Self.selectorWidth, height: Self.rowHeight)
+                        .contentShape(Rectangle())
+                }
+                .buttonStyle(.plain)
+                .help(selected ? "Deselect line" : "Select line to stage, unstage or discard")
+            } else {
+                Color.clear.frame(width: Self.selectorWidth, height: Self.rowHeight)
+            }
+        }
     }
 
     private func gutter(_ value: Int?) -> some View {
         Text(value.map(String.init) ?? "").foregroundStyle(.secondary)
-            .frame(width: 37, alignment: .trailing).padding(.trailing, 5)
+            .frame(width: Self.gutterWidth, alignment: .trailing).padding(.trailing, 5)
             .accessibilityHidden(value == nil)
     }
 
@@ -199,13 +142,35 @@ struct PatchView: View {
         }
     }
 
-    private func tint(_ kind: PatchLine.Kind?) -> Color {
-        switch kind {
-        case .added: return .green.opacity(0.14)
-        case .removed: return .red.opacity(0.14)
-        case .header: return .blue.opacity(0.11)
+    private func tint(_ line: PatchLine) -> Color {
+        let selected = staging?.selection.contains(line.index) == true
+        switch line.kind {
+        case .added: return .green.opacity(selected ? 0.3 : 0.13)
+        case .removed: return .red.opacity(selected ? 0.3 : 0.13)
+        case .header: return .blue.opacity(0.09)
         case .context: return .clear
-        case nil: return .secondary.opacity(0.08)
         }
+    }
+
+    /// Text with tabs expanded and the word-level differences on a stronger background.
+    static func styled(_ prefix: String, _ line: PatchLine) -> AttributedString {
+        let characters = Array(line.text)
+        let strong: Color = line.kind == .added ? .green.opacity(0.38) : .red.opacity(0.38)
+        var result = AttributedString(prefix)
+        var cursor = 0
+        func append(_ range: Range<Int>, emphasized: Bool) {
+            guard !range.isEmpty else { return }
+            var piece = AttributedString(String(characters[range]).replacingOccurrences(of: "\t", with: tabReplacement))
+            if emphasized { piece.backgroundColor = strong }
+            result.append(piece)
+        }
+        for range in line.emphasis.sorted(by: { $0.lowerBound < $1.lowerBound })
+        where range.lowerBound >= cursor && range.upperBound <= characters.count {
+            append(cursor..<range.lowerBound, emphasized: false)
+            append(range, emphasized: true)
+            cursor = range.upperBound
+        }
+        append(cursor..<characters.count, emphasized: false)
+        return result
     }
 }

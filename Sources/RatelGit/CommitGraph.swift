@@ -1,13 +1,13 @@
 import SwiftUI
 import RatelGitCore
 
-struct GraphEdge {
+struct GraphEdge: Hashable, Sendable {
     let from: Int
     let to: Int
     let color: Int
 }
 
-struct CommitRow: Identifiable {
+struct CommitRow: Identifiable, Hashable, Sendable {
     let commit: GraphLine
     let lane: Int
     let color: Int
@@ -16,11 +16,14 @@ struct CommitRow: Identifiable {
     var id: Int { commit.id }
 }
 
-struct CommitGraph {
+/// Lane layout for a topologically ordered commit list that may start from many ref heads.
+/// A parent that has not been loaded yet keeps its lane open, so lines run off the bottom of the last row
+/// and continue when the next page arrives.
+struct CommitGraph: Sendable {
     let rows: [CommitRow]
     let columns: Int
 
-    private struct Lane {
+    private struct Lane: Sendable {
         let target: String
         let color: Int
     }
@@ -30,9 +33,9 @@ struct CommitGraph {
         var result: [CommitRow] = []
         var width = 1
         var nextColor = 0
-        let commits = lines.filter { $0.hash != nil }
-        for commit in commits {
+        for commit in lines {
             guard let hash = commit.hash else { continue }
+            // A ref head that no earlier row points at starts a new lane on the right.
             let existing = lanes.firstIndex { $0.target == hash }
             let index = existing ?? lanes.count
             let color = existing.map { lanes[$0].color } ?? nextColor
@@ -70,15 +73,27 @@ struct CommitGraph {
     }
 }
 
+enum GraphStyle {
+    static let laneWidth: CGFloat = 14
+    static let inset: CGFloat = 10
+    /// Wider graphs are clipped so the message column keeps its room.
+    static let maximumLanes = 12
+    static let palette: [Color] = [.blue, .orange, .green, .pink, .purple, .teal, .red, .indigo, .brown, .mint]
+
+    static func width(columns: Int) -> CGFloat {
+        CGFloat(min(columns, maximumLanes)) * laneWidth + inset
+    }
+
+    static func color(_ index: Int) -> Color { palette[index % palette.count] }
+}
+
 struct GraphGlyph: View {
     let row: CommitRow
     let columns: Int
-    private let palette: [Color] = [.teal, .orange, .indigo, .pink, .mint, .blue, .purple, .yellow]
 
     var body: some View {
         Canvas { context, size in
             let middle = size.height / 2
-            let node = CGPoint(x: x(row.lane), y: middle)
             for edge in row.incoming {
                 stroke(edge, start: 0, end: middle, context: context)
             }
@@ -86,19 +101,23 @@ struct GraphGlyph: View {
                 let start = edge.from == row.lane ? middle : 0
                 stroke(edge, start: start, end: size.height, context: context)
             }
-            let ring = row.commit.parents.count > 1
-            let radius: CGFloat = ring ? 5 : 4
-            let dot = Path(ellipseIn: CGRect(x: node.x - radius, y: node.y - radius,
-                                              width: radius * 2, height: radius * 2))
-            let color = palette[row.color % palette.count]
-            context.fill(dot, with: .color(ring ? Color(nsColor: .controlBackgroundColor) : color))
-            context.stroke(dot, with: .color(color), lineWidth: 2)
+            drawNode(at: CGPoint(x: x(row.lane), y: middle), context: context)
         }
-        .frame(width: CGFloat(columns * 17 + 8))
+        .frame(width: GraphStyle.width(columns: columns))
+        .clipped()
         .accessibilityHidden(true)
     }
 
-    private func x(_ lane: Int) -> CGFloat { CGFloat(12 + lane * 17) }
+    private func drawNode(at node: CGPoint, context: GraphicsContext) {
+        let merge = row.commit.parents.count > 1
+        let radius: CGFloat = merge ? 4.5 : 4
+        let dot = Path(ellipseIn: CGRect(x: node.x - radius, y: node.y - radius, width: radius * 2, height: radius * 2))
+        let color = GraphStyle.color(row.color)
+        context.fill(dot, with: .color(merge ? Color(nsColor: .textBackgroundColor) : color))
+        context.stroke(dot, with: .color(color), lineWidth: merge ? 2 : 1.5)
+    }
+
+    private func x(_ lane: Int) -> CGFloat { GraphStyle.inset / 2 + GraphStyle.laneWidth / 2 + CGFloat(lane) * GraphStyle.laneWidth }
 
     private func stroke(_ edge: GraphEdge, start: CGFloat, end: CGFloat, context: GraphicsContext) {
         let first = CGPoint(x: x(edge.from), y: start)
@@ -107,7 +126,7 @@ struct GraphGlyph: View {
         var path = Path()
         path.move(to: first)
         path.addCurve(to: last, control1: CGPoint(x: first.x, y: start + offset),
-                     control2: CGPoint(x: last.x, y: end - offset))
-        context.stroke(path, with: .color(palette[edge.color % palette.count]), lineWidth: 1.7)
+                      control2: CGPoint(x: last.x, y: end - offset))
+        context.stroke(path, with: .color(GraphStyle.color(edge.color)), lineWidth: 1.6)
     }
 }
