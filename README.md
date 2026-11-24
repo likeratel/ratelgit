@@ -10,7 +10,7 @@ ratelgit is a Git client built around worktrees, for macOS and Windows. Add your
 
 > Built with AI. I set the direction; the code, tests and docs were written in sessions with [Codex](https://openai.com/codex/) and [Claude Code](https://claude.com/claude-code). See [Why I built this](#why-i-built-this).
 
-> **Verification status.** Developed on macOS (Apple Silicon). The Git core is covered by integration tests against temporary repositories and the UI by unit and browser tests. Windows builds in CI but has not been run. See [Limits](#limits).
+> **Verification status.** Developed on macOS (Apple Silicon). The Git core is covered by integration tests against temporary repositories and the UI by unit and browser tests. On Windows the build and the tests pass in CI, but the app has not been run there. See [Limits](#limits).
 
 ![History of a worktree: the commit graph on top, the selected commit's message, files and diff below](docs/screenshots/history.png)
 
@@ -19,7 +19,7 @@ The screenshots show made-up sample data.
 ## At a glance
 
 - **Projects, then worktrees.** Every repository you add sits in the sidebar with its worktrees, each showing its branch, changed files and upstream distance. Jump anywhere with `⌘P`.
-- **History first.** The graph of all branches opens by default, with the selected commit's details below it. Filter it to the branches you pick, the way Fork does.
+- **History first.** The graph opens on what you usually need, your current branch plus `origin/main` (or `origin/master`), with the selected commit's details below it. **Show All** brings every branch in; filter to the branches you pick, the way Fork does, and **Default** takes you back.
 - **Stage exactly what you mean.** Whole files, hunks or single lines, with word-level highlights in the diff.
 - **Conflicts without leaving the app.** A banner tracks the merge or rebase, and each conflict chunk shows both sides by branch name so you can pick one, the other or both.
 - **Your Git, your credentials.** ratelgit runs the Git already on your computer and stores no passwords or tokens.
@@ -45,7 +45,17 @@ What I did: decided the scope, starting from a read-only browser and then adding
 
 ## Install
 
-There is no packaged release yet, so build it from source. You need Git 2.36 or later, Node.js 22, pnpm 10 and a current stable Rust toolchain (plus the [Tauri prerequisites](https://tauri.app/start/prerequisites/) for your platform).
+ratelgit needs [Git](https://git-scm.com/downloads) 2.36 or later installed. Download the latest build from the [Releases page](https://github.com/likeratel/ratelgit/releases/latest):
+
+| Platform                                   | File                                                                     |
+| ------------------------------------------ | ------------------------------------------------------------------------ |
+| macOS 12 or later, Apple Silicon and Intel | `RatelGit_<version>_universal.dmg`                                       |
+| Windows 10 or later, x64                   | `ratelgit_<version>_x64-setup.exe` or `ratelgit_<version>_x64_en-US.msi` |
+
+- **macOS.** Open the DMG and drag **RatelGit** to Applications. The app is Developer ID signed and notarized, so it opens without a security override. Each release lists the DMG's SHA-256; check it with `shasum -a 256 <file>.dmg`.
+- **Windows.** Run the installer. It is not code signed, so SmartScreen may warn about an unknown publisher: choose **More info → Run anyway**. The Windows build is produced and tested in CI but has not been run on a real machine yet; see [Limits](#limits).
+
+To build from source instead, you need Git 2.36 or later, Node.js 22, pnpm 10 and a current stable Rust toolchain (plus the [Tauri prerequisites](https://tauri.app/start/prerequisites/) for your platform).
 
 ```sh
 git clone https://github.com/likeratel/ratelgit.git
@@ -62,7 +72,7 @@ ratelgit calls the `git` on your `PATH`, then the usual install locations (`/opt
 
 1. Press `⌘O` (`Ctrl+O` on Windows) and choose a repository or any of its linked worktrees. It is added under **Projects** and stays there after a relaunch. Add as many repositories as you like.
 2. Pick a worktree under its project, step through a project's worktrees with `⌥⌘[` and `⌥⌘]`, or press `⌘P` and type part of a project, worktree or branch name. Each worktree row shows its branch, changed files and how far it is ahead of or behind its upstream.
-3. **History** (`⌘1`) is the default view. Select a commit and its message, files and diff appear below the list.
+3. **History** (`⌘1`) is the default view. It starts on the default filter: the current branch plus `origin/main` or `origin/master`. **Show All** in the bar above the list shows every branch and **Default** goes back. Select a commit and its message, files and diff appear below the list.
 4. Switch to **Changes** (`⌘2`) to stage files, hunks or lines, write a message and press **Commit**.
 
 On Windows every `⌘` shortcut uses `Ctrl` instead.
@@ -80,13 +90,14 @@ On Windows every `⌘` shortcut uses `Ctrl` instead.
 ### History
 
 - The commit list fills the top of the window and the selected commit's details fill the bottom: message, author, date, hash and parents with the changed files on the left, the selected file's diff on the right. Drag the divider to give either part more room; the split is remembered.
-- By default the graph shows every local branch, remote branch and tag together with HEAD. Lanes and merge lines are drawn in colour; the main line keeps its colour and merged branches curve into it.
+- The graph can show every local branch, remote branch and tag together with HEAD, or only the filtered ones. Lanes and merge lines are drawn in colour; the main line keeps its colour and merged branches curve into it.
 - Columns: graph, ref badges and message, author, date and short hash. Author and date hide when the list gets narrow. A remote branch at the same commit as a local one is folded into the local badge as a small globe.
 - An **Uncommitted changes (n)** row sits on top when the worktree has changes; clicking it opens Changes.
 - History loads 500 commits at a time and fetches the next page as you scroll to the end. Lanes whose parents are on the next page keep running down. The list is virtualized, so long histories scroll smoothly.
 - Filter like Fork:
+  - The default filter is the current branch (it follows checkouts, a detached HEAD, and the worktree you pick) plus `origin/main` and `origin/master` when they exist. A project uses it until you change the filter.
   - Hover a branch, tag, remote folder or branch folder in the sidebar and click its funnel to show only the commits reachable from it. Several filters combine as a union.
-  - A bar above the list names the active filters, removes them one by one or clears them all, and tells you when the worktree's HEAD is outside the filter.
+  - A bar above the list is always there. It names the active filters ("Current branch · main", `origin/main`, …), removes them one by one, and tells you when the worktree's HEAD is outside the filter. **Show All** clears every filter and **Default** goes back to the default filter. Changing the default filter turns it into your own, with the current branch still in it.
   - `⌘⇧A` toggles "current branch only".
   - Filters are kept per project across relaunches.
 - Search by message, author, date, hash or ref name within the loaded commits. `↑` `↓` move between commits when the list has focus.
@@ -145,7 +156,7 @@ Shortcuts are matched on the physical key, so they keep working with a Korean or
 
 ## Limits
 
-- **Windows** builds in CI on every push but has never been run. Path handling, the console-less Git processes and the shortcuts are written for it and compile, but nothing has been checked on a real Windows machine.
+- **Windows** is built in CI on every push, and the Git core's integration tests and the browser tests pass there, but the app itself has never been opened on a Windows machine. The window, the shortcuts, the installers and the console-less Git processes are unchecked in real use.
 - Only checked on macOS with the system light and dark appearances; Linux is not a target.
 - Search only looks through the commits loaded so far.
 - The files of a merge commit are compared with its first parent.

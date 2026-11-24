@@ -61,6 +61,8 @@ describe("app store", () => {
 
   it("keeps filters per project and saves them", async () => {
     const { fake, store } = await started();
+    store.getState().clearFilter();
+    await idle(store);
     store
       .getState()
       .toggleFilter([

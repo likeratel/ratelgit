@@ -22,6 +22,7 @@ export function initialData(bridge: Bridge): Data {
     projectPath: null,
     activePath: null,
     references: [],
+    defaultFilter: ["HEAD"],
     history: EMPTY_HISTORY,
     files: [],
     tracking: null,

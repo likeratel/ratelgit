@@ -4,7 +4,12 @@
  * run Git.
  */
 
-import { BridgeError, type Bridge, type BridgeErrorKind } from "../bridge";
+import {
+  BridgeError,
+  type Bridge,
+  type BridgeErrorKind,
+  type HistoryFilterRequest,
+} from "../bridge";
 import type {
   Action,
   ChangedFile,
@@ -129,12 +134,24 @@ function page(
   return { lines, complete: skip + PAGE_SIZE >= commits.length };
 }
 
+const MAINLINES = ["refs/remotes/origin/main", "refs/remotes/origin/master"];
+
+/** As in the core: HEAD plus origin/main and origin/master when they exist. */
+function defaultFilter(project: FakeProject): string[] {
+  return [
+    "HEAD",
+    ...MAINLINES.filter((id) => project.refs.some((r) => r.id === id)),
+  ];
+}
+
 function snapshot(
   world: FakeWorld,
   path: string,
-  filter: readonly string[],
+  requested: HistoryFilterRequest,
 ): WorktreeSnapshot {
   const [project, tree] = findTree(world, path);
+  const fallback = defaultFilter(project);
+  const filter = requested ?? fallback;
   const pruned = filter.filter(
     (id) => id === "HEAD" || project.refs.some((r) => r.id === id),
   );
@@ -142,6 +159,7 @@ function snapshot(
   return {
     references: refsForTree(project, tree),
     filter: pruned,
+    defaultFilter: fallback,
     history: page(project, tree, pruned, 0),
     headHidden: pruned.length > 0 && !visible.has(tree.head),
     files: tree.files,
@@ -253,7 +271,7 @@ export function createFakeBridge(
     loadHistory: (worktree, filter, skip) =>
       respond("loadHistory", [worktree, filter, skip], () => {
         const [project, tree] = findTree(world, worktree);
-        return page(project, tree, filter, skip);
+        return page(project, tree, filter ?? defaultFilter(project), skip);
       }),
     loadCommit: (worktree, hash) =>
       respond("loadCommit", [worktree, hash], () => {

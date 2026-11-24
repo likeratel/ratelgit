@@ -28,7 +28,7 @@ fn trap(dir: &std::path::Path, marker: &std::path::Path) -> std::path::PathBuf {
 fn read_everything(client: &Git) {
     use ratelgit_lib::git::Scope;
     use ratelgit_lib::snapshot;
-    let snapshot = snapshot::load(client, &[]).unwrap();
+    let snapshot = snapshot::load(client, Some(&[])).unwrap();
     for line in snapshot.history.lines.iter().take(3) {
         let _ = client.commit_detail(&line.hash);
         if let Ok(files) = client.commit_files(&line.hash) {

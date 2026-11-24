@@ -13,12 +13,13 @@ export function isCurrentBranchOnly(filter: HistoryFilter): boolean {
   return filter.length === 1 && filter[0] === HEAD_FILTER;
 }
 
-/** Turns a branch, or every branch in a folder, on or off. A folder that is fully on turns off. */
+/** Turns a branch, or every branch in a folder, on or off. A folder that is fully on turns
+ * off. `HEAD` ("Current branch") stays in the filter and keeps following checkouts. */
 export function toggleRefs(
   filter: HistoryFilter,
   ids: readonly string[],
 ): string[] {
-  const base = filter.filter((ref) => ref !== HEAD_FILTER);
+  const base = [...filter];
   const allOn = ids.length > 0 && ids.every((id) => base.includes(id));
   return allOn
     ? base.filter((ref) => !ids.includes(ref))

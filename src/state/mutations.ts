@@ -10,7 +10,7 @@ import {
 import { renameRef } from "../lib/historyFilter";
 import { forceDeleteConfirmation, forceResolveConfirmation } from "./dialogs";
 import {
-  activeFilter,
+  filterSetting,
   describe,
   projectOf,
   sameFile,
@@ -99,8 +99,11 @@ export function mutationOperations(
     // Only a commit made from the message box uses the draft; a merge commit has its own.
     if (action.type === "commit")
       set({ drafts: { ...state.drafts, [worktree]: "" } });
-    if (action.type === "renameBranch" && state.projectPath) {
-      const current = state.filters[state.projectPath] ?? [];
+    // The default filter holds no branch names, so only a chosen filter needs renaming.
+    const current = state.projectPath
+      ? state.filters[state.projectPath]
+      : undefined;
+    if (action.type === "renameBranch" && state.projectPath && current) {
       const renamed = renameRef(
         current,
         action.reference,
@@ -118,7 +121,7 @@ export function mutationOperations(
     const token = tokens.next("workspace");
     const [trees, snapshot] = await Promise.all([
       bridge.listWorktrees(worktree),
-      bridge.loadWorktree(worktree, activeFilter(get())),
+      bridge.loadWorktree(worktree, filterSetting(get())),
     ]);
     if (!tokens.current("workspace", token) || get().activePath !== worktree)
       return null;

@@ -5,6 +5,7 @@ import {
   dropStashConfirmation,
   renamePrompt,
 } from "../../state/dialogs";
+import { activeFilter } from "../../state/helpers";
 import type { AppState } from "../../state/types";
 import type { MenuItem } from "../../ui/menu";
 
@@ -13,9 +14,7 @@ export function referenceMenu(
   reference: Reference,
   state: AppState,
 ): MenuItem[] {
-  const filtered = (
-    state.projectPath ? (state.filters[state.projectPath] ?? []) : []
-  ).includes(reference.id);
+  const filtered = activeFilter(state).includes(reference.id);
   const filterItems: MenuItem[] = [
     {
       label:

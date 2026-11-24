@@ -52,6 +52,14 @@ For visual changes, write screenshots with
 `SHOTS_DIR=/some/folder pnpm test:e2e tests/screens.spec.ts` and look at them in light and dark
 mode and at the minimum window size (1050×630).
 
+## Releases
+
+1. Set the same version in `package.json`, `src-tauri/Cargo.toml` (then `Cargo.lock`) and `src-tauri/tauri.conf.json`, and commit.
+2. Push a tag `vX.Y.Z` on that commit. `.github/workflows/release.yml` checks the tag against the three manifests, builds the Windows installers and attaches them to a draft GitHub Release. They are not code signed.
+3. On a Mac with the Developer ID certificate, build the universal app (`pnpm tauri build --target universal-apple-darwin --bundles app,dmg` with `APPLE_SIGNING_IDENTITY` set), notarize and staple the app, put the stapled app into the disk image, sign, notarize and staple the image, and upload it to the draft.
+4. Write the release notes with the DMG's SHA-256 and publish the draft.
+5. Delete the app bundles left under `src-tauri/target` so Spotlight lists only the installed app.
+
 ## Commits
 
 Use [Conventional Commits](https://www.conventionalcommits.org/), for example `feat: add tag menu`.

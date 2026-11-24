@@ -75,6 +75,8 @@ export interface Data {
   projectPath: string | null;
   activePath: string | null;
   references: Reference[];
+  /** What the default History filter resolves to for the selected worktree. */
+  defaultFilter: string[];
   history: HistoryState;
   files: ChangedFile[];
   tracking: Tracking | null;
@@ -113,7 +115,10 @@ export interface Operations {
   loadMoreHistory(): Promise<void>;
   toggleFilter(ids: readonly string[]): void;
   removeFromFilter(id: string): void;
+  /** Shows every branch ("Show All"). */
   clearFilter(): void;
+  /** Goes back to the default filter ("Default"). */
+  resetFilter(): void;
   toggleCurrentBranchOnly(): void;
   filterTo(id: string): void;
   selectCommit(hash: string | null): Promise<void>;

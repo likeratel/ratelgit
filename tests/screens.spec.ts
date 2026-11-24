@@ -179,3 +179,29 @@ test("new worktree dialog", async ({ page }) => {
   await expect(page.getByText("/work/trees")).toBeVisible();
   await shot(page, "k-new-worktree");
 });
+
+test("filter bar states", async ({ page }) => {
+  await open(page, "light");
+  await shot(page, "l-default-filter");
+  await page
+    .getByTestId("filter-bar")
+    .getByRole("button", { name: /^Show All/ })
+    .click();
+  await shot(page, "m-all-branches");
+  await page
+    .getByTestId("filter-bar")
+    .getByRole("button", { name: /^Default/ })
+    .click();
+  await page.setViewportSize({ width: 1050, height: 630 });
+  for (const ref of [
+    "refs/heads/feature/auth/oauth",
+    "refs/heads/feature/ui/dark-mode",
+    "refs/heads/fix/login-redirect",
+  ]) {
+    const row = page.locator(`[data-ref="${ref}"]`);
+    await row.hover();
+    await row.locator(".filter-toggle").click();
+  }
+  await page.mouse.move(700, 500);
+  await shot(page, "n-minimum-many-chips");
+});

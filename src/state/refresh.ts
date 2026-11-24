@@ -1,5 +1,5 @@
 import type { Bridge, WorktreeSnapshot } from "../bridge";
-import { activeFilter, describe } from "./helpers";
+import { describe, filterSetting } from "./helpers";
 import { followFile } from "./mutations";
 import type { Tokens } from "./tokens";
 import type { GetState, HistoryState, SetState } from "./types";
@@ -50,7 +50,7 @@ export function createQuietRefresh(
     try {
       const [trees, snapshot] = await Promise.all([
         bridge.listWorktrees(path),
-        bridge.loadWorktree(path, activeFilter(state)),
+        bridge.loadWorktree(path, filterSetting(state)),
       ]);
       const now = get();
       if (
@@ -66,6 +66,7 @@ export function createQuietRefresh(
             : p,
         ),
         references: snapshot.references,
+        defaultFilter: snapshot.defaultFilter,
         files: snapshot.files,
         tracking: snapshot.tracking,
         operation: snapshot.operation,

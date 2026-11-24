@@ -157,7 +157,7 @@ fn snapshot_prunes_deleted_refs_and_reports_hidden_head() {
         "refs/heads/fix/login".to_string(),
         "refs/heads/gone".to_string(),
     ];
-    let snapshot = snapshot::load(&client, &filter).unwrap();
+    let snapshot = snapshot::load(&client, Some(&filter)).unwrap();
     assert_eq!(snapshot.filter, filter[..2].to_vec());
     let titles: HashSet<_> = snapshot
         .history
@@ -169,9 +169,9 @@ fn snapshot_prunes_deleted_refs_and_reports_hidden_head() {
     assert!(!titles.contains("Other only"));
     assert!(!snapshot.head_hidden);
 
-    let head_only = snapshot::load(&client, &["HEAD".to_string()]).unwrap();
+    let head_only = snapshot::load(&client, Some(&["HEAD".to_string()])).unwrap();
     assert_eq!(head_only.history.lines[0].subject, "Merge branch 'side'");
-    let everything = snapshot::load(&client, &[]).unwrap();
+    let everything = snapshot::load(&client, Some(&[])).unwrap();
     assert!(everything
         .history
         .lines

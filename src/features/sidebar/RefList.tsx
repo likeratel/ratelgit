@@ -18,7 +18,7 @@ import {
 } from "../../lib/branchTree";
 import { baseName } from "../../lib/paths";
 import { useApp, useAppStore } from "../../state/context";
-import { activeFilter } from "../../state/helpers";
+import { activeFilter, isDefaultFilter } from "../../state/helpers";
 import { useContextMenu } from "../../ui/menu";
 import { referenceMenu } from "./refMenu";
 
@@ -312,7 +312,10 @@ export function RefList() {
   const project = useApp((s) =>
     s.projects.find((p) => p.path === s.projectPath),
   );
-  const filtered = useApp((s) => activeFilter(s).length > 0);
+  // Marked only for a filter the user chose; the default filter is the normal state.
+  const filtered = useApp(
+    (s) => !isDefaultFilter(s) && activeFilter(s).length > 0,
+  );
   const hasWorktree = useApp((s) => s.activePath !== null);
   if (!hasWorktree) return null;
   return (

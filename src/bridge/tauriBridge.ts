@@ -72,11 +72,14 @@ export function createTauriBridge(): Bridge {
     listWorktrees: (worktree) =>
       call("list_worktrees", z.array(worktreeSchema), { worktree }),
     loadWorktree: (worktree, filter) =>
-      call("load_worktree", snapshotSchema, { worktree, filter: [...filter] }),
+      call("load_worktree", snapshotSchema, {
+        worktree,
+        filter: filter ? [...filter] : null,
+      }),
     loadHistory: (worktree, filter, skip) =>
       call("load_history", historyPageSchema, {
         worktree,
-        filter: [...filter],
+        filter: filter ? [...filter] : null,
         skip,
       }),
     loadCommit: (worktree, hash) =>

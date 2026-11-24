@@ -156,7 +156,7 @@ describe("history and filters", () => {
     const { store } = await started((fake) => ({
       ...fake,
       loadHistory: async () => {
-        const first = (await fake.loadWorktree(WEB, [])).history.lines;
+        const first = (await fake.loadWorktree(WEB, null)).history.lines;
         return {
           lines: [
             { ...first[1], index: 99 },

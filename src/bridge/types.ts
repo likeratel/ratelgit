@@ -108,6 +108,7 @@ export const trackingSchema = z.strictObject({
 export const snapshotSchema = z.strictObject({
   references: z.array(referenceSchema),
   filter: z.array(z.string()),
+  defaultFilter: z.array(z.string()),
   history: historyPageSchema,
   headHidden: z.boolean(),
   files: z.array(changedFileSchema),
@@ -186,7 +187,7 @@ export const uiPreferencesSchema = z.strictObject({
 });
 
 export const preferencesSchema = z.strictObject({
-  version: z.literal(1),
+  version: z.literal(2),
   projects: z.array(z.string()),
   filters: z.record(z.string(), z.array(z.string())),
   ui: uiPreferencesSchema,

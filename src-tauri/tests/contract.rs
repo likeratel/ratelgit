@@ -125,9 +125,9 @@ fn samples(root: &Path) -> Value {
         .unwrap();
 
     let client = Git::new(&repo);
-    let main_snapshot = snapshot::load(&client, &[]).unwrap();
-    let filtered = snapshot::load(&client, &["refs/heads/fix/login".to_string()]).unwrap();
-    let conflicted = snapshot::load(&Git::new(&linked), &[]).unwrap();
+    let main_snapshot = snapshot::load(&client, Some(&[])).unwrap();
+    let filtered = snapshot::load(&client, Some(&["refs/heads/fix/login".to_string()])).unwrap();
+    let conflicted = snapshot::load(&Git::new(&linked), None).unwrap();
     let page = client.history(&Scope::all(), 2, 3).unwrap();
     let merge = main_snapshot
         .history

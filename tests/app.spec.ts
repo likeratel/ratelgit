@@ -29,10 +29,47 @@ test("moves between projects and worktrees", async ({ page }) => {
   ).toContainText("api-server");
 });
 
-test("filters history by branches and clears the filter", async ({ page }) => {
+test("starts on the default filter, shows all, and goes back", async ({
+  page,
+}) => {
+  const bar = page.getByTestId("filter-bar");
+  const showAll = bar.getByRole("button", { name: /^Show All/ });
+  const reset = bar.getByRole("button", { name: /^Default/ });
+  await expect(bar.locator(".filter-chip")).toHaveText([
+    "Current branch · main",
+    "origin/main",
+  ]);
+  await expect(reset).toBeDisabled();
+  await expect(showAll).toBeEnabled();
+  await expect(
+    page
+      .getByTestId("commit-row")
+      .filter({ hasText: "Add a dark colour scheme" }),
+  ).toHaveCount(0);
+
+  await showAll.click();
+  await expect(bar).toContainText("All branches");
+  await expect(bar.locator(".filter-chip")).toHaveCount(0);
+  await expect(showAll).toBeDisabled();
+  await expect(reset).toBeEnabled();
+  await expect(
+    page
+      .getByTestId("commit-row")
+      .filter({ hasText: "Add a dark colour scheme" }),
+  ).toHaveCount(1);
+
+  await reset.click();
+  await expect(bar.locator(".filter-chip")).toHaveCount(2);
+  await expect(reset).toBeDisabled();
+});
+
+test("filters history by branches and shows everything again", async ({
+  page,
+}) => {
+  const bar = page.getByTestId("filter-bar");
+  await bar.getByRole("button", { name: /^Show All/ }).click();
   await toggleRefFilter(page, "refs/heads/feature/auth/oauth");
   await toggleRefFilter(page, "refs/heads/fix/login-redirect");
-  const bar = page.getByTestId("filter-bar");
   await expect(bar.locator(".filter-chip")).toHaveCount(2);
   await expect(bar).toContainText("HEAD not shown");
   await expect(page.getByTestId("commit-row").first()).toContainText(
@@ -46,21 +83,38 @@ test("filters history by branches and clears the filter", async ({ page }) => {
     .getByRole("button", { name: "Remove feature/auth/oauth from filter" })
     .click();
   await expect(bar.locator(".filter-chip")).toHaveCount(1);
-  await bar.getByRole("button", { name: "Show All Branches" }).click();
-  await expect(bar).toHaveCount(0);
+  await bar.getByRole("button", { name: /^Show All/ }).click();
+  await expect(bar).toContainText("All branches");
   await expect(page.getByTestId("commit-row").first()).toContainText(
     "Document local setup",
   );
 
   await page.keyboard.press("ControlOrMeta+Shift+KeyA");
-  await expect(page.getByTestId("filter-bar")).toContainText(
-    "Current branch (main)",
-  );
+  await expect(bar.locator(".filter-chip")).toHaveText([
+    "Current branch · main",
+  ]);
   await page.keyboard.press("ControlOrMeta+Shift+KeyA");
-  await expect(page.getByTestId("filter-bar")).toHaveCount(0);
+  await expect(bar).toContainText("All branches");
+});
+
+test("adding a branch to the default filter keeps the current branch", async ({
+  page,
+}) => {
+  await toggleRefFilter(page, "refs/heads/fix/login-redirect");
+  const bar = page.getByTestId("filter-bar");
+  await expect(bar.locator(".filter-chip")).toHaveText([
+    "Current branch · main",
+    "origin/main",
+    "fix/login-redirect",
+  ]);
+  await expect(bar.getByRole("button", { name: /^Default/ })).toBeEnabled();
 });
 
 test("filter of a folder covers every branch in it", async ({ page }) => {
+  await page
+    .getByTestId("filter-bar")
+    .getByRole("button", { name: /^Show All/ })
+    .click();
   const folder = page.locator(".folder-row", { hasText: "auth" });
   await folder.hover();
   await folder.locator(".filter-toggle").click();

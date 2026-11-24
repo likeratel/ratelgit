@@ -5,7 +5,12 @@ import {
   toggleCurrentBranch,
   toggleRefs,
 } from "../lib/historyFilter";
-import { activeFilter, describe, EMPTY_HISTORY } from "./helpers";
+import {
+  activeFilter,
+  describe,
+  EMPTY_HISTORY,
+  filterSetting,
+} from "./helpers";
 import type { Tokens } from "./tokens";
 import type { GetState, Operations, SetState } from "./types";
 
@@ -16,6 +21,7 @@ type WorkspaceOps = Pick<
   | "toggleFilter"
   | "removeFromFilter"
   | "clearFilter"
+  | "resetFilter"
   | "toggleCurrentBranchOnly"
   | "filterTo"
 >;
@@ -28,11 +34,15 @@ export function applySnapshot(
   token: number,
 ) {
   const { projectPath, filters } = get();
-  const current = projectPath ? (filters[projectPath] ?? []) : [];
+  // A chosen filter loses refs that no longer exist; the default filter is not stored.
+  const chosen = projectPath ? filters[projectPath] : undefined;
   const filterChanged =
-    projectPath !== null && !sameFilter(current, snapshot.filter);
+    projectPath !== null &&
+    chosen !== undefined &&
+    !sameFilter(chosen, snapshot.filter);
   set({
     references: snapshot.references,
+    defaultFilter: snapshot.defaultFilter,
     history: {
       lines: snapshot.history.lines,
       complete: snapshot.history.complete,
@@ -64,7 +74,7 @@ export function createReload(
     // An earlier error stays until the user dismisses it or starts another action.
     set({ loading: true });
     try {
-      const snapshot = await bridge.loadWorktree(path, activeFilter(get()));
+      const snapshot = await bridge.loadWorktree(path, filterSetting(get()));
       if (!tokens.current("workspace", token) || get().activePath !== path)
         return;
       applySnapshot(set, get, snapshot, token);
@@ -83,20 +93,32 @@ export function workspaceOperations(
   reload: () => Promise<void>,
   persist: () => void,
 ): WorkspaceOps {
-  const setFilter = (next: string[]) => {
+  /** `null` returns to the default filter. */
+  const setFilter = (next: string[] | null) => {
     const state = get();
     const project = state.projectPath;
     if (!project || !state.activePath || state.mutation) return;
-    if (sameFilter(activeFilter(state), next)) return;
-    if (next.length > MAX_FILTER_REFS) {
+    const current = filterSetting(state);
+    const unchanged =
+      next === null || current === null
+        ? next === current
+        : sameFilter(current, next);
+    if (unchanged) return;
+    if (next !== null && next.length > MAX_FILTER_REFS) {
       set({
         error: `History can be filtered to at most ${MAX_FILTER_REFS} branches and tags. Remove some from the filter first.`,
       });
       return;
     }
     tokens.next("history");
+    const filters =
+      next === null
+        ? Object.fromEntries(
+            Object.entries(state.filters).filter(([key]) => key !== project),
+          )
+        : { ...state.filters, [project]: next };
     set({
-      filters: { ...state.filters, [project]: next },
+      filters,
       history: EMPTY_HISTORY,
       commit: null,
       historyFile: null,
@@ -121,7 +143,7 @@ export function workspaceOperations(
       try {
         const page = await bridge.loadHistory(
           path,
-          activeFilter(state),
+          filterSetting(state),
           state.history.lines.length,
         );
         const now = get();
@@ -154,6 +176,7 @@ export function workspaceOperations(
     toggleFilter: (ids) => setFilter(toggleRefs(activeFilter(get()), ids)),
     removeFromFilter: (id) => setFilter(removeRef(activeFilter(get()), id)),
     clearFilter: () => setFilter([]),
+    resetFilter: () => setFilter(null),
     toggleCurrentBranchOnly: () =>
       setFilter(toggleCurrentBranch(activeFilter(get()))),
     filterTo(id) {

@@ -117,7 +117,7 @@ describe("re-review", () => {
       ...fake,
       async loadWorktree(worktree, filter) {
         const snapshot = await fake.loadWorktree(worktree, filter);
-        return worktree === WEB && filter.length === 0 && emptied
+        return worktree === WEB && filter === null && emptied
           ? { ...snapshot, history: { lines: [], complete: true } }
           : snapshot;
       },

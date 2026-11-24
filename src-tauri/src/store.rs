@@ -11,7 +11,9 @@ use crate::error::{AppError, AppResult};
 use crate::git::validate;
 
 pub const FILE_NAME: &str = "ratelgit.json";
-const VERSION: u32 = 1;
+/// 2: an empty filter list means "show every branch"; a project without an entry uses the
+/// default filter. In version 1 an empty list meant "no filter chosen" and reads as default.
+const VERSION: u32 = 2;
 const MAX_PROJECTS: usize = 500;
 pub const SIDEBAR_WIDTH: (u32, u32, u32) = (220, 272, 420);
 pub const SPLIT_RANGE: (f64, f64) = (0.2, 0.8);
@@ -78,7 +80,8 @@ pub struct Preferences {
     pub version: u32,
     /// Main worktree paths of the projects in the sidebar, in display order.
     pub projects: Vec<String>,
-    /// History filter per project path: full ref names or `HEAD`.
+    /// History filter per project path: full ref names or `HEAD`. A project without an entry
+    /// uses the default filter; an empty list shows every branch.
     pub filters: BTreeMap<String, Vec<String>>,
     pub ui: UiPreferences,
 }
@@ -101,7 +104,7 @@ impl Preferences {
         let filters = self
             .filters
             .into_iter()
-            .filter(|(project, refs)| projects.contains(project) && !refs.is_empty())
+            .filter(|(project, _)| projects.contains(project))
             .filter(|(_, refs)| validate::filter_refs(refs).is_ok())
             .collect();
         Self {
@@ -144,10 +147,17 @@ fn from_value(value: &serde_json::Value) -> Preferences {
             })
             .unwrap_or_default()
     };
+    let version = value.get("version").and_then(|v| v.as_u64()).unwrap_or(1);
     let filters = value
         .get("filters")
         .and_then(|f| f.as_object())
-        .map(|map| map.iter().map(|(k, v)| (k.clone(), strings(v))).collect())
+        .map(|map| {
+            map.iter()
+                .map(|(k, v)| (k.clone(), strings(v)))
+                // Version 1 stored "no filter chosen" as an empty list: that is the default now.
+                .filter(|(_, refs)| version >= 2 || !refs.is_empty())
+                .collect()
+        })
         .unwrap_or_default();
     let defaults = UiPreferences::default();
     let ui = value.get("ui").and_then(|ui| ui.as_object());

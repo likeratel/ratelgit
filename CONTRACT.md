@@ -88,7 +88,9 @@ interface Tracking { branch: string; remote: string; target: string; ahead: numb
 
 interface WorktreeSnapshot {
   references: Reference[];
-  filter: string[];          // requested filter minus refs that no longer exist
+  filter: string[];          // filter used: requested minus refs that no longer exist,
+                             // or the default filter when `filter` was null
+  defaultFilter: string[];   // "HEAD" plus refs/remotes/origin/main and .../master that exist
   history: HistoryPage;      // first page (500 commits)
   headHidden: boolean;       // the filter hides the checked-out commit
   files: ChangedFile[];
@@ -130,9 +132,10 @@ interface UiPreferences {
 }
 
 interface Preferences {
-  version: 1;
+  version: 2;
   projects: string[];        // main worktree paths, display order
-  filters: Record<string, string[]>; // project path -> full ref names or "HEAD"
+  filters: Record<string, string[]>; // project path -> full ref names or "HEAD";
+                             // no entry: default filter; []: every branch
   ui: UiPreferences;
 }
 
@@ -146,7 +149,8 @@ interface AppError {         // rejected value of every command
 }
 ```
 
-Preferences are stored as `ratelgit.json` in the app config folder. Each field is read on its
+Preferences are stored as `ratelgit.json` in the app config folder. In version 1 an empty
+filter list meant "nothing chosen"; it is read as the default filter. Each field is read on its
 own: unknown fields are ignored and a field with a wrong type falls back to its default, so the
 project list survives files from other versions. Out-of-range sizes are clamped, filters of
 unknown projects and invalid refs are dropped, and only a file that is not JSON at all is
@@ -161,8 +165,8 @@ renamed to `ratelgit.json.corrupt` instead of being overwritten.
 | `add_project` | – | `{ projects: Project[]; worktree: string \| null } \| null` | Shows the native folder picker in the core. `null` when cancelled. `worktree` is the worktree containing the chosen folder. |
 | `remove_project` | `{ path }` | `string[]` | Stored project paths after removal. |
 | `list_worktrees` | `{ worktree }` | `Worktree[]` | All worktrees of the project that owns `worktree`. |
-| `load_worktree` | `{ worktree, filter: string[] }` | `WorktreeSnapshot` | `filter`: `[]` for every branch, remote and tag, or full ref names / `"HEAD"` (≤ 200). |
-| `load_history` | `{ worktree, filter, skip }` | `HistoryPage` | Next page of the same ordering. |
+| `load_worktree` | `{ worktree, filter: string[] \| null }` | `WorktreeSnapshot` | `filter`: `null` for the default filter (`HEAD` plus `origin/main`/`origin/master` that exist, worked out now), `[]` for every branch, remote and tag, or full ref names / `"HEAD"` (≤ 200). `"HEAD"` follows the worktree's checked-out commit. |
+| `load_history` | `{ worktree, filter: string[] \| null, skip }` | `HistoryPage` | Next page of the same ordering. |
 | `load_commit` | `{ worktree, hash }` | `CommitInfo` | `hash`: 40 or 64 lowercase hex. |
 | `load_diff` | `{ worktree, file: ChangedFile, commit: string \| null, ignoreWhitespace }` | `FileDiff` | `commit` is required for `committed` files. |
 | `load_conflict` | `{ worktree, path }` | `ConflictDocument` | Only for a file that is conflicted now (`stale` otherwise). Reads the work-tree file; never writes. Nested, unbalanced or ambiguous markers give `malformed`; a `|||||||` line counts as a base marker only when `merge.conflictStyle` is `diff3` or `zdiff3`. |

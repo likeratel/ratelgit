@@ -17,6 +17,7 @@ export const EMPTY_HISTORY = {
 export function clearedWorkspace(): Partial<Data> {
   return {
     references: [],
+    defaultFilter: INITIAL_DEFAULT_FILTER,
     history: EMPTY_HISTORY,
     files: [],
     tracking: null,
@@ -28,15 +29,28 @@ export function clearedWorkspace(): Partial<Data> {
   };
 }
 
-/** Shared empty filter, so selectors return a stable value. */
-const NO_FILTER: string[] = [];
+/** Before the first snapshot arrives the default filter is at least the current branch. */
+export const INITIAL_DEFAULT_FILTER: string[] = ["HEAD"];
 
-export function activeFilter(
+/** The project's chosen filter: refs, `[]` for every branch, or `null` for the default. */
+export function filterSetting(
   state: Pick<Data, "filters" | "projectPath">,
+): string[] | null {
+  if (!state.projectPath) return null;
+  return state.filters[state.projectPath] ?? null;
+}
+
+export function isDefaultFilter(
+  state: Pick<Data, "filters" | "projectPath">,
+): boolean {
+  return filterSetting(state) === null;
+}
+
+/** The refs History is limited to now; the default filter when none was chosen. */
+export function activeFilter(
+  state: Pick<Data, "filters" | "projectPath" | "defaultFilter">,
 ): string[] {
-  return state.projectPath
-    ? (state.filters[state.projectPath] ?? NO_FILTER)
-    : NO_FILTER;
+  return filterSetting(state) ?? state.defaultFilter;
 }
 
 export function activeWorktree(

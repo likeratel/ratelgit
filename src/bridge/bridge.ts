@@ -17,6 +17,9 @@ import type {
   WorktreeSnapshot,
 } from "./types";
 
+/** Refs to show, `[]` for every branch, or `null` for the default filter. */
+export type HistoryFilterRequest = readonly string[] | null;
+
 /** Everything the web UI may ask of the core. See CONTRACT.md. */
 export interface Bridge {
   getBootstrap(): Promise<Bootstrap>;
@@ -24,13 +27,14 @@ export interface Bridge {
   addProject(): Promise<AddedProject>;
   removeProject(path: string): Promise<string[]>;
   listWorktrees(worktree: string): Promise<Worktree[]>;
+  /** `filter`: refs to show, `[]` for every branch, `null` for the default filter. */
   loadWorktree(
     worktree: string,
-    filter: readonly string[],
+    filter: HistoryFilterRequest,
   ): Promise<WorktreeSnapshot>;
   loadHistory(
     worktree: string,
-    filter: readonly string[],
+    filter: HistoryFilterRequest,
     skip: number,
   ): Promise<HistoryPage>;
   loadCommit(worktree: string, hash: string): Promise<CommitInfo>;

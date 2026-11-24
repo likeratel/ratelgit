@@ -297,7 +297,7 @@ export function createWorld(): FakeWorld {
     },
     conflicts: { [`${WEB_LOGIN}|src/session.ts`]: sessionConflict },
     preferences: {
-      version: 1,
+      version: 2,
       projects: [WEB, API],
       filters: {},
       ui: {

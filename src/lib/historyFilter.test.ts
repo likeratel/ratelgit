@@ -26,7 +26,8 @@ describe("history filter", () => {
     expect(isCurrentBranchOnly(toggleCurrentBranch([]))).toBe(true);
     expect(toggleCurrentBranch(["HEAD"])).toEqual([]);
     expect(toggleCurrentBranch([a])).toEqual(["HEAD"]);
-    expect(toggleRefs(["HEAD"], [a])).toEqual([a]);
+    expect(toggleRefs(["HEAD"], [a])).toEqual(["HEAD", a]);
+    expect(toggleRefs(["HEAD", a], [a])).toEqual(["HEAD"]);
   });
 
   it("prunes, renames and removes", () => {

@@ -128,11 +128,13 @@ pub async fn list_worktrees(registry: Shared<'_>, worktree: String) -> AppResult
 pub async fn load_worktree(
     registry: Shared<'_>,
     worktree: String,
-    filter: Vec<String>,
+    filter: Option<Vec<String>>,
 ) -> AppResult<WorktreeSnapshot> {
-    validate::filter_refs(&filter)?;
+    if let Some(refs) = &filter {
+        validate::filter_refs(refs)?;
+    }
     in_worktree(&registry, worktree, move |git| {
-        snapshot::load(&git, &filter)
+        snapshot::load(&git, filter.as_deref())
     })
     .await
 }
@@ -141,12 +143,15 @@ pub async fn load_worktree(
 pub async fn load_history(
     registry: Shared<'_>,
     worktree: String,
-    filter: Vec<String>,
+    filter: Option<Vec<String>>,
     skip: usize,
 ) -> AppResult<HistoryPage> {
-    validate::filter_refs(&filter)?;
+    if let Some(refs) = &filter {
+        validate::filter_refs(refs)?;
+    }
     in_worktree(&registry, worktree, move |git| {
-        git.history(&Scope(filter), skip, HISTORY_PAGE_SIZE)
+        let refs = snapshot::effective_filter(&git, filter.as_deref())?;
+        git.history(&Scope(refs), skip, HISTORY_PAGE_SIZE)
     })
     .await
 }

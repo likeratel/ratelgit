@@ -85,7 +85,9 @@
   display: flex;
   gap: 5px;
   min-width: 0;
-  flex: 1;
+  flex: 1 1 0;
+  /* Chips that do not fit fade out at the edge; the area scrolls and its title lists all. */
+  mask-image: linear-gradient(to right, black calc(100% - 28px), transparent);
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -102,6 +104,26 @@
   color: var(--accent-text);
   font-weight: 550;
   flex: none;
+}
+
+.filter-chip.head {
+  background: var(--accent);
+  color: var(--on-accent);
+}
+
+.filter-bar.all {
+  background: transparent;
+}
+
+.filter-bar.all .filter-icon {
+  color: var(--text-faint);
+}
+
+.filter-actions {
+  display: flex;
+  gap: 6px;
+  flex: none;
+  margin-left: auto;
 }
 
 .filter-chip button {

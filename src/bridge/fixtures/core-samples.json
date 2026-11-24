@@ -60,7 +60,7 @@
           "lastWorktree": null,
           "sidebarWidth": 272
         },
-        "version": 1
+        "version": 2
       }
     },
     {
@@ -83,7 +83,7 @@
           "lastWorktree": "/work/sample",
           "sidebarWidth": 272
         },
-        "version": 1
+        "version": 2
       }
     }
   ],
@@ -247,6 +247,10 @@
   },
   "load_worktree": [
     {
+      "defaultFilter": [
+        "HEAD",
+        "refs/remotes/origin/main"
+      ],
       "files": [
         {
           "conflict": null,
@@ -511,6 +515,10 @@
       }
     },
     {
+      "defaultFilter": [
+        "HEAD",
+        "refs/remotes/origin/main"
+      ],
       "files": [
         {
           "conflict": null,
@@ -732,6 +740,10 @@
       }
     },
     {
+      "defaultFilter": [
+        "HEAD",
+        "refs/remotes/origin/main"
+      ],
       "files": [
         {
           "conflict": "bothModified",
@@ -740,7 +752,10 @@
           "status": "U"
         }
       ],
-      "filter": [],
+      "filter": [
+        "HEAD",
+        "refs/remotes/origin/main"
+      ],
       "headHidden": false,
       "history": {
         "complete": true,
@@ -775,54 +790,9 @@
           },
           {
             "author": "RatelGit Test",
-            "date": "2026-02-27",
-            "hash": "792ca8d9a69a303b174025ef7af9edfc5a844875",
-            "index": 2,
-            "parents": [
-              "c63eaac630528115cb6b13339141ab1c1febeac8"
-            ],
-            "refs": [
-              "clash"
-            ],
-            "shortHash": "792ca8d",
-            "subject": "Edit readme on clash",
-            "timestamp": 1772199800
-          },
-          {
-            "author": "RatelGit Test",
-            "date": "2026-02-26",
-            "hash": "3eb89b67692b1145197a9802236ae1ce5d0cc6df",
-            "index": 3,
-            "parents": [
-              "b996326d1f50bcc2ed4cfdade21da3899e83c4da"
-            ],
-            "refs": [
-              "feature/x/y"
-            ],
-            "shortHash": "3eb89b6",
-            "subject": "Extend nested feature",
-            "timestamp": 1772140400
-          },
-          {
-            "author": "RatelGit Test",
-            "date": "2026-02-26",
-            "hash": "b996326d1f50bcc2ed4cfdade21da3899e83c4da",
-            "index": 4,
-            "parents": [
-              "c63eaac630528115cb6b13339141ab1c1febeac8"
-            ],
-            "refs": [
-              "origin/feature/x/y"
-            ],
-            "shortHash": "b996326",
-            "subject": "Start nested feature",
-            "timestamp": 1772124200
-          },
-          {
-            "author": "RatelGit Test",
             "date": "2026-02-26",
             "hash": "c63eaac630528115cb6b13339141ab1c1febeac8",
-            "index": 5,
+            "index": 2,
             "parents": [
               "8bb178aa9d12032eb8041666930fb06814f29dd4",
               "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad"
@@ -839,7 +809,7 @@
             "author": "RatelGit Test",
             "date": "2026-02-26",
             "hash": "4e8d1bae30d7984eb2b273bdf9d7da5f7d4b4aad",
-            "index": 6,
+            "index": 3,
             "parents": [
               "41ec393259bf2702d7115f0cd49c449eafde6f5e"
             ],
@@ -854,7 +824,7 @@
             "author": "RatelGit Test",
             "date": "2026-02-26",
             "hash": "8bb178aa9d12032eb8041666930fb06814f29dd4",
-            "index": 7,
+            "index": 4,
             "parents": [
               "41ec393259bf2702d7115f0cd49c449eafde6f5e"
             ],
@@ -867,7 +837,7 @@
             "author": "RatelGit Test",
             "date": "2026-02-25",
             "hash": "41ec393259bf2702d7115f0cd49c449eafde6f5e",
-            "index": 8,
+            "index": 5,
             "parents": [
               "13623abd11fbd89e623a1ea667b806f5ca52afae"
             ],
@@ -882,7 +852,7 @@
             "author": "RatelGit Test",
             "date": "2026-02-25",
             "hash": "13623abd11fbd89e623a1ea667b806f5ca52afae",
-            "index": 9,
+            "index": 6,
             "parents": [],
             "refs": [],
             "shortHash": "13623ab",
@@ -1017,6 +987,6 @@
       "lastWorktree": "/work/sample",
       "sidebarWidth": 272
     },
-    "version": 1
+    "version": 2
   }
 }
