@@ -4,7 +4,8 @@ set -eu
 cd "$(dirname "$0")/.."
 swift build --product ratelgit
 bin_dir="$(swift build --show-bin-path)"
-bundle=".build/ratelgit.app"
+# The capital letters give Spotlight a word boundary, so typing "git" finds the app.
+bundle=".build/RatelGit.app"
 mkdir -p "$bundle/Contents/MacOS" "$bundle/Contents/Resources"
 cp "$bin_dir/ratelgit" "$bundle/Contents/MacOS/ratelgit"
 cp Resources/AppIcon.icns "$bundle/Contents/Resources/AppIcon.icns"
@@ -16,7 +17,7 @@ cat > "$bundle/Contents/Info.plist" <<'PLIST'
   <key>CFBundleExecutable</key><string>ratelgit</string>
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundleIdentifier</key><string>dev.ratelgit.app</string>
-  <key>CFBundleName</key><string>ratelgit</string>
+  <key>CFBundleName</key><string>RatelGit</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>0.2.0</string>
   <key>CFBundleVersion</key><string>2</string>

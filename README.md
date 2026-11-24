@@ -1,23 +1,119 @@
 # ratelgit
 
-로컬 저장소의 worktree를 빠르게 오가며 Git 이력과 변경을 확인하고 커밋하는 macOS 클라이언트입니다.
+English · [한국어](README.ko.md)
 
-## 실행
+<img src="docs/ratelgit.png" alt="The ratelgit icon: a commit graph over a honey badger's two-tone coat" width="128" />
 
-macOS 14 이상에서 실행됩니다. 소스에서 빌드하려면 Xcode 15 이상을 선택하거나 `DEVELOPER_DIR`로 Xcode의 `Contents/Developer` 경로를 지정하세요.
+ratelgit is a macOS Git client built around worktrees. Pick a worktree in the sidebar and its commit graph, changed files and diffs follow, so you can move between several checkouts of one repository without losing your place. It is named after the ratel, the honey badger that does not back off from a few stings. Built with Swift and SwiftUI on top of the Git command line you already have.
+
+> Built with AI. I set the direction; the code, tests and docs were written in sessions with [Codex](https://openai.com/codex/) and [Claude Code](https://claude.com/claude-code). See [Why I built this](#why-i-built-this).
+
+![Working changes of the selected worktree with a unified diff](docs/screenshots/changes.png)
+
+The screenshots are rendered from a sample repository with made-up commits.
+
+## Contents
+
+- [Why I built this](#why-i-built-this)
+- [Install](#install)
+- [Quick start](#quick-start)
+- [Features](#features)
+- [Shortcuts](#shortcuts)
+- [Limits](#limits)
+- [Development](#development)
+- [License](#license)
+
+## Why I built this
+
+I keep several worktrees of the same repository open at once, and what I want from a Git client is simple: choose a worktree, then see its graph and its diff. Sourcetree, Fork and GitKraken cover the everyday Git features well, but switching between worktrees is not what they are built around. ratelgit borrows their basics (branches, a commit graph, staging, a diff viewer, fetch, pull and push) and puts the worktree list first.
+
+What I did: decided the scope, starting from a read-only browser and then adding staging, commits and remote actions, and chose the safety rules (pull is fast-forward only, push is a plain push to the configured upstream). The implementation, tests and docs were written with Codex and Claude Code, and each stage went through an independent review round.
+
+## Install
+
+There is no packaged release yet, so build it from source. You need macOS 14 or later and Xcode 15 or later. If Xcode is not the selected developer directory, set `DEVELOPER_DIR` to its `Contents/Developer` path.
 
 ```sh
+git clone https://github.com/likeratel/ratelgit.git
+cd ratelgit
 ./scripts/run-app.sh
 ```
 
-⌘O로 저장소 또는 연결된 worktree를 엽니다. 왼쪽의 **Worktrees**에서 작업 폴더를 고르거나 ⌥⌘[와 ⌥⌘]로 전환합니다. ⌘R로 새로 고칩니다.
+The script builds `.build/RatelGit.app` and opens it. To launch it from Spotlight, copy the bundle into your Applications folder:
 
-- **Changes**에서 상태별 파일과 diff를 보고, 파일을 stage·unstage하거나 스테이징한 변경을 커밋합니다. 커밋 메시지 초안은 앱을 사용하는 동안 worktree마다 따로 유지됩니다.
-- **History**에서 브랜치와 머지 흐름을 색상 그래프로 봅니다. 작성자, 날짜, 메시지, 해시, 참조 이름을 검색할 수 있습니다. 선택한 이력에서 최신 커밋을 최대 400개 표시하며, 머지 커밋의 파일은 첫 번째 부모와 비교합니다.
-- 오른쪽에서 줄 번호가 있는 **Unified / Split** diff를 전환합니다.
-- **Actions**에서 브랜치를 만들거나 변경을 stash할 수 있습니다. 사이드바의 로컬 브랜치와 stash를 우클릭하면 체크아웃과 적용 동작이 표시됩니다.
-- **Fetch / Pull / Push**를 상단에서 실행합니다. Pull은 fast-forward만 허용하며, Pull과 Push에는 원격 upstream 설정이 필요합니다. 원격 인증에는 기존 Git 자격 증명 설정을 사용합니다.
+```sh
+./scripts/run-app.sh --build-only
+cp -R .build/RatelGit.app ~/Applications/
+```
 
-## 테스트
+## Quick start
 
-`swift test`는 Xcode의 XCTest가 필요합니다. 통합 테스트는 임시 worktree와 로컬 원격 저장소를 사용합니다.
+1. Press `⌘O` and choose a repository or any of its linked worktrees.
+2. Pick a worktree under **Worktrees**, or step through them with `⌥⌘[` and `⌥⌘]`. Each row shows the branch and the number of changed files.
+3. In **Changes**, select a file to read its diff, stage it with the `+` button, write a message and press **Commit**.
+4. Switch to **History** to follow the graph, then select a commit to see its files and diff.
+
+## Features
+
+### Worktrees
+
+- Every worktree of the repository is listed with its branch and change count, and the list can be filtered by name or branch.
+- Switching a worktree reloads the graph, branches, changed files and upstream status for that checkout.
+- A commit message draft stays with its worktree while the app is open.
+
+### Changes
+
+- Files are grouped into unstaged, untracked and staged, and can be staged or unstaged one file at a time.
+- Commit is disabled until something is staged, a message is written and no conflicted file is left.
+
+### History
+
+- A colour graph draws branch lanes and merge lines; the mainline keeps its colour and merged branches curve into it.
+- Search by message, author, date, hash or ref name.
+- Select a local branch, remote branch, tag or stash in the sidebar to browse its history.
+
+![Commit graph with a merge, and the files and diff of the selected commit](docs/screenshots/history.png)
+
+### Diff
+
+- Unified and split layouts, both with line numbers.
+- The split layout measures the longest line, so long lines and wide characters such as Hangul stay in their own column.
+
+### Branches, stashes and remotes
+
+- Create a branch from the current HEAD, or check out a local branch from its context menu.
+- Stash staged, unstaged and untracked changes, and apply a stash from its context menu.
+- Fetch, Pull and Push sit in the top bar, next to how far the branch is ahead of or behind its upstream.
+
+## Shortcuts
+
+| Shortcut | Action            |
+| -------- | ----------------- |
+| `⌘O`     | Open a repository |
+| `⌘R`     | Refresh           |
+| `⌥⌘[`    | Previous worktree |
+| `⌥⌘]`    | Next worktree     |
+
+## Limits
+
+- History shows the latest 400 commits of the selected ref.
+- The files of a merge commit are compared with its first parent.
+- Staging works on whole files; there is no hunk or line staging, and no discard.
+- Pull is fast-forward only. Pull and Push need a remote upstream on the current branch.
+- There is no merge, rebase, branch deletion or worktree creation yet. Use the command line for those.
+- Remote authentication uses your existing Git credential setup; ratelgit does not store credentials.
+
+## Development
+
+```sh
+swift build
+swift test
+```
+
+`swift test` needs the XCTest that ships with Xcode. The integration tests create temporary repositories, worktrees and a local remote, and never touch your own repositories.
+
+The layout is small: `Sources/RatelGitCore` runs Git and parses its output, `Sources/RatelGit` holds the SwiftUI app, and `scripts/make-icon.swift` redraws the app icon.
+
+## License
+
+MIT
