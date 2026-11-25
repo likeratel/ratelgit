@@ -17,3 +17,4 @@ worktree를 빠르게 오가며 이력과 변경을 보는 Git 클라이언트. 
 - TypeScript 확인: `pnpm check`, `pnpm test`, `pnpm build`, `pnpm test:e2e`, `pnpm format:check`.
 - Rust 확인: `cargo fmt --check`, `cargo test`, `cargo clippy --all-targets -- -D warnings` (src-tauri).
 - 릴리스를 게시했거나 빌드한 앱을 Applications에 설치한 뒤, 또는 `pnpm tauri build`로 확인만 한 뒤에는 프로젝트 안에 남은 앱 번들(`src-tauri/target/**/bundle/macos/*.app`)을 지운다. 남겨 두면 Spotlight에 설치본과 빌드 산출물이 함께 검색된다. DMG 등 릴리스 산출물은 지우지 않는다.
+- 앱은 `/Applications` 한 곳에만 설치한다. 새 빌드를 설치할 때는 기존 번들을 교체하고, `~/Applications` 등 다른 위치에 사본을 두지 않는다. 설치 후 Spotlight에 이 앱의 번들이 하나만 검색되는지 확인한다(`mdfind "kMDItemContentType == 'com.apple.application-bundle' && kMDItemDisplayName == 'ratel*'cdw"`).
