@@ -212,6 +212,25 @@ pub fn is_unc(path: &Path) -> bool {
     text.starts_with("\\\\") || text.starts_with("//")
 }
 
+/// Device names Windows reserves (also with an extension, such as `con.txt`) and names that
+/// end in a dot or space. Refused on every platform so a project works on both.
+fn reserved_on_windows(name: &str) -> bool {
+    if name.ends_with('.') || name.ends_with(' ') {
+        return true;
+    }
+    let stem = name
+        .split('.')
+        .next()
+        .unwrap_or(name)
+        .trim_end()
+        .to_ascii_uppercase();
+    let numbered = |prefix: &str| {
+        stem.strip_prefix(prefix)
+            .is_some_and(|n| n.len() == 1 && n.as_bytes()[0].is_ascii_digit() && n != "0")
+    };
+    matches!(stem.as_str(), "CON" | "PRN" | "AUX" | "NUL") || numbered("COM") || numbered("LPT")
+}
+
 /// The new worktree folder: `name` (one plain folder name) inside `parent`.
 pub fn child_folder(parent: &Path, name: &str) -> AppResult<PathBuf> {
     let name = name.trim();
@@ -226,6 +245,11 @@ pub fn child_folder(parent: &Path, name: &str) -> AppResult<PathBuf> {
             .any(|c| c.is_control() || matches!(c, '/' | '\\' | ':'));
     if !plain {
         return Err(invalid());
+    }
+    if reserved_on_windows(name) {
+        return Err(AppError::invalid(
+            "This folder name is reserved on Windows. Choose another name.",
+        ));
     }
     let parts: Vec<Component> = Path::new(name).components().collect();
     if !matches!(parts[..], [Component::Normal(_)]) {
@@ -257,6 +281,14 @@ mod tests {
             assert!(child_folder(&parent, bad).is_err(), "{bad:?}");
         }
         assert!(child_folder(Path::new("relative"), "x").is_err());
+        // Names Windows reserves are refused everywhere, so a project works on both.
+        for reserved in [
+            "CON", "prn", "Aux", "nul", "COM1", "lpt9", "con.txt", "name.", "name .",
+        ] {
+            assert!(child_folder(&parent, reserved).is_err(), "{reserved:?}");
+        }
+        assert!(child_folder(&parent, "console").is_ok());
+        assert!(child_folder(&parent, "com10").is_ok());
         assert!(is_unc(Path::new("\\\\server\\share")));
         assert!(is_unc(Path::new("\\\\?\\C:\\work")));
         assert!(!is_unc(&parent));

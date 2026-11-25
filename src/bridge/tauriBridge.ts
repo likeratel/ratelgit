@@ -6,6 +6,10 @@ import {
   addedProjectSchema,
   appErrorSchema,
   bootstrapSchema,
+  removalPreviewSchema,
+  removalResultSchema,
+  removeOptionsSchema,
+  worktreePlanSchema,
   chosenParentSchema,
   openResultSchema,
   commitInfoSchema,
@@ -95,6 +99,21 @@ export function createTauriBridge(): Bridge {
       call("load_conflict", conflictDocumentSchema, { worktree, path }),
     openFile: (worktree, path) =>
       call("open_file", openResultSchema, { worktree, path }),
+    planWorktree: (worktree, parent, folder, newBranch) =>
+      call("plan_worktree", worktreePlanSchema, {
+        worktree,
+        parent,
+        folder,
+        newBranch,
+      }),
+    worktreeRemoval: (worktree, target) =>
+      call("worktree_removal", removalPreviewSchema, { worktree, target }),
+    removeWorktree: (worktree, target, options) =>
+      call("remove_worktree", removalResultSchema, {
+        worktree,
+        target,
+        options: removeOptionsSchema.parse(options),
+      }),
     chooseWorktreeParent: () =>
       call("choose_worktree_parent", chosenParentSchema),
     runAction: (worktree, action) =>

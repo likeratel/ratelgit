@@ -1,6 +1,5 @@
 import type { Action, ChangedFile, OperationState, Reference } from "../bridge";
 import { OPERATION_NAMES } from "../lib/conflict";
-import { suggestWorktreeName } from "../lib/paths";
 import type { Confirmation, Prompt } from "./types";
 
 const quote = (text: string) => `“${text}”`;
@@ -155,18 +154,6 @@ export const renamePrompt = (reference: Reference) =>
     reference,
   });
 
-export const addWorktreePrompt = (reference: Reference, projectPath: string) =>
-  prompt({
-    kind: "addWorktree",
-    title: `Check Out ${quote(reference.name)} in a New Worktree`,
-    message:
-      "Name of the new folder. It is created next to the project unless you choose another folder.",
-    placeholder: "Folder name",
-    confirm: "Add Worktree",
-    initial: suggestWorktreeName(projectPath, reference.name),
-    reference,
-  });
-
 export const mergeMessagePrompt = (operation: OperationState) =>
   prompt({
     kind: "mergeMessage",
@@ -184,7 +171,6 @@ export const mergeMessagePrompt = (operation: OperationState) =>
 export function promptAction(
   current: Prompt,
   text: string,
-  parent: string | null = null,
 ): [Action, string] | null {
   switch (current.kind) {
     case "createBranch":
@@ -200,18 +186,6 @@ export function promptAction(
               name: text.trim(),
             },
             "Rename Branch",
-          ]
-        : null;
-    case "addWorktree":
-      return current.reference
-        ? [
-            {
-              type: "addWorktree",
-              reference: current.reference.id,
-              parent,
-              name: text.trim(),
-            },
-            "Add Worktree",
           ]
         : null;
     case "mergeMessage":

@@ -16,10 +16,10 @@ use tauri_plugin_opener::OpenerExt;
 use crate::error::{AppError, AppResult};
 use crate::git::{
     is_unc, Action, ChangedFile, CommitInfo, ConflictDocument, FileDiff, Git, HistoryPage,
-    OpenDecision, Scope, Worktree,
+    OpenDecision, RemovalPreview, RemovalResult, RemoveOptions, Scope, Worktree,
 };
 use crate::git::{validate, HISTORY_PAGE_SIZE};
-use crate::projects::{AddedProject, Project, Registry};
+use crate::projects::{AddedProject, Project, Registry, WorktreePlan};
 use crate::snapshot::{self, WorktreeSnapshot};
 use crate::store::{Preferences, UiPreferences};
 
@@ -201,12 +201,12 @@ pub async fn run_action(registry: Shared<'_>, worktree: String, action: Value) -
         match &action {
             // The folder is built in the core from a picked folder and a plain name.
             Action::AddWorktree {
-                reference,
+                branch,
                 parent,
-                name,
+                folder,
             } => {
-                let location = registry.worktree_folder(&worktree, parent.as_deref(), name)?;
-                git.add_worktree(reference, &location)
+                let location = registry.worktree_folder(&worktree, parent.as_deref(), folder)?;
+                git.create_worktree(branch, &location)
             }
             _ => git.execute(&action),
         }
@@ -327,4 +327,46 @@ pub async fn choose_worktree_parent(
         }))
     })
     .await
+}
+
+/// Checks a new worktree before it is created, for messages next to the fields. The core
+/// checks everything again when the worktree is added.
+#[tauri::command]
+pub async fn plan_worktree(
+    registry: Shared<'_>,
+    worktree: String,
+    parent: Option<String>,
+    folder: String,
+    new_branch: Option<String>,
+) -> AppResult<WorktreePlan> {
+    let registry = Arc::clone(&registry);
+    blocking(move || {
+        registry.plan_worktree(&worktree, parent.as_deref(), &folder, new_branch.as_deref())
+    })
+    .await
+}
+
+/// What removing the worktree at `target` would delete. `worktree` is any registered
+/// worktree of the same project; `target` must be in that project's `git worktree list`.
+#[tauri::command]
+pub async fn worktree_removal(
+    registry: Shared<'_>,
+    worktree: String,
+    target: String,
+) -> AppResult<RemovalPreview> {
+    let registry = Arc::clone(&registry);
+    blocking(move || Git::new(registry.main_worktree(&worktree)?).removal_preview(&target)).await
+}
+
+/// Removes a linked worktree (Git deletes its folder), then optionally its branches.
+#[tauri::command]
+pub async fn remove_worktree(
+    registry: Shared<'_>,
+    worktree: String,
+    target: String,
+    options: Value,
+) -> AppResult<RemovalResult> {
+    let options: RemoveOptions = parse(options, "Invalid options")?;
+    let registry = Arc::clone(&registry);
+    blocking(move || registry.remove_worktree(&worktree, &target, &options)).await
 }

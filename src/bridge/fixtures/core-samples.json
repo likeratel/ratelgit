@@ -965,8 +965,32 @@
       "action": "revealed"
     }
   ],
+  "plan_worktree": [
+    {
+      "branchError": null,
+      "folderError": null,
+      "path": "/work/sample-next"
+    },
+    {
+      "branchError": "A branch named “main” already exists.",
+      "folderError": "Enter a folder name without slashes for the new worktree.",
+      "path": null
+    }
+  ],
   "remove_project": [
     "/work/sample"
+  ],
+  "remove_worktree": [
+    {
+      "branchDeleted": true,
+      "problem": "The worktree and the local branch were removed, but deleting the remote branch origin/x failed: offline",
+      "remoteDeleted": false
+    },
+    {
+      "branchDeleted": null,
+      "problem": null,
+      "remoteDeleted": null
+    }
   ],
   "run_action": null,
   "save_preferences": {
@@ -988,5 +1012,48 @@
       "sidebarWidth": 272
     },
     "version": 2
-  }
+  },
+  "worktree_removal": [
+    {
+      "branch": "fix/login",
+      "branchBlock": null,
+      "changes": 1,
+      "ignored": 0,
+      "ignoredExamples": [],
+      "isMain": false,
+      "locked": null,
+      "operation": "merge",
+      "path": "/work/sample-login",
+      "prunable": false,
+      "remoteBlock": null,
+      "submodules": false,
+      "tip": "820d9c4fd111d10c0a1c60a86192302c7af1ba7e",
+      "unmergedCommits": 2,
+      "unmergedWithRemote": 2,
+      "untracked": 0,
+      "upstream": null
+    },
+    {
+      "branch": "main",
+      "branchBlock": "“main” is the project's default branch.",
+      "changes": 2,
+      "ignored": 0,
+      "ignoredExamples": [],
+      "isMain": true,
+      "locked": null,
+      "operation": null,
+      "path": "/work/sample",
+      "prunable": false,
+      "remoteBlock": "origin/main is the remote's default branch, so it is kept.",
+      "submodules": false,
+      "tip": "c63eaac630528115cb6b13339141ab1c1febeac8",
+      "unmergedCommits": 0,
+      "unmergedWithRemote": 0,
+      "untracked": 1,
+      "upstream": {
+        "name": "main",
+        "remote": "origin"
+      }
+    }
+  ]
 }

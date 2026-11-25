@@ -338,3 +338,115 @@ test("saving a resolution closes the conflict viewer", async ({ page }) => {
     page.locator(".change-group.staged .change-row.selected"),
   ).toContainText("session.ts");
 });
+
+test("adds a worktree on a new branch and switches to it", async ({ page }) => {
+  await page
+    .locator(".project-row", { hasText: "ratel-web" })
+    .first()
+    .click({ button: "right" });
+  await page.getByRole("menuitem", { name: "New Worktree…" }).click();
+  const dialog = page.getByRole("dialog", { name: "New worktree" });
+  const add = dialog.getByRole("button", { name: "Add Worktree" });
+  const name = dialog.getByRole("textbox", { name: "Branch name" });
+  await name.fill("main");
+  await expect(dialog).toContainText("A branch named “main” already exists.");
+  await expect(add).toBeDisabled();
+  await name.fill("next/idea");
+  await expect(
+    dialog.getByRole("textbox", { name: "Folder name" }),
+  ).toHaveValue("ratel-web-next-idea");
+  await expect(dialog.getByTestId("worktree-path")).toContainText(
+    "/work/ratel-web-next-idea",
+  );
+  await expect(
+    dialog.getByTestId("start-point").getByRole("option", { selected: true }),
+  ).toContainText("origin/main");
+  await add.click();
+  await expect(dialog).toHaveCount(0);
+  await expect(headerName(page)).toHaveText("ratel-web-next-idea");
+  await expect(worktree(page, "ratel-web-next-idea")).toHaveCount(1);
+  expect(await lastAction(page)).toMatchObject({
+    type: "addWorktree",
+    branch: {
+      type: "new",
+      name: "next/idea",
+      startPoint: "refs/remotes/origin/main",
+    },
+    folder: "ratel-web-next-idea",
+  });
+});
+
+test("removing a worktree with changes needs an explicit acknowledgement", async ({
+  page,
+}) => {
+  await worktree(page, "ratel-web-dark").click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Remove Worktree…" }).click();
+  const dialog = page.getByRole("dialog", { name: /Remove worktree/ });
+  await expect(dialog).toContainText("/work/ratel-web-dark");
+  await expect(dialog).toContainText(
+    "1 changed file will be permanently deleted",
+  );
+  await expect(
+    dialog.getByRole("checkbox", { name: /Also delete local branch/ }),
+  ).toBeChecked();
+  const remote = dialog.getByRole("checkbox", {
+    name: /Also delete remote branch/,
+  });
+  await expect(remote).not.toBeChecked();
+  await expect(dialog.getByRole("button", { name: "Cancel" })).toBeFocused();
+  const remove = dialog.getByRole("button", { name: "Remove Worktree" });
+  await expect(remove).toBeDisabled();
+  await dialog
+    .getByRole("checkbox", { name: "I understand these will be lost" })
+    .check();
+  await expect(remove).toBeEnabled();
+  await remove.click();
+  await expect(dialog).toHaveCount(0);
+  await expect(worktree(page, "ratel-web-dark")).toHaveCount(0);
+  await expect(page.locator(".error-bar")).toHaveCount(0);
+});
+
+test("the main worktree cannot be removed", async ({ page }) => {
+  await worktree(page, "ratel-web").click({ button: "right" });
+  await expect(
+    page.getByRole("menuitem", { name: "Main Worktree Cannot Be Removed" }),
+  ).toBeDisabled();
+});
+
+test("deleting the remote branch too asks again for what only it still had", async ({
+  page,
+}) => {
+  await worktree(page, "ratel-web-dark").click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Remove Worktree…" }).click();
+  const dialog = page.getByRole("dialog", { name: /Remove worktree/ });
+  const acknowledge = dialog.getByRole("checkbox", {
+    name: "I understand these will be lost",
+  });
+  const remove = dialog.getByRole("button", { name: "Remove Worktree" });
+  await acknowledge.check();
+  await expect(remove).toBeEnabled();
+  await dialog
+    .getByRole("checkbox", { name: /Also delete remote branch/ })
+    .check();
+  await expect(dialog).toContainText("once the remote branch is deleted too");
+  await expect(acknowledge).not.toBeChecked();
+  await expect(remove).toBeDisabled();
+  await acknowledge.check();
+  await remove.click();
+  await expect(dialog).toHaveCount(0);
+  expect(
+    await page.evaluate(
+      () =>
+        window.__ratelgitFake
+          ?.calls()
+          .filter((c) => c.command === "removeWorktree")
+          .at(-1)?.args[2],
+    ),
+  ).toMatchObject({
+    force: true,
+    deleteBranch: true,
+    allowUnmerged: true,
+    deleteRemote: true,
+    seen: { lostCommits: 1, changes: 1 },
+  });
+});

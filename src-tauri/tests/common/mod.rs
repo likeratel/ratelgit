@@ -199,3 +199,17 @@ pub fn last_subject(directory: &Path) -> String {
         .trim()
         .to_string()
 }
+
+/// Removes a worktree agreeing to exactly what its preview shows right now, as the dialog does.
+pub fn remove_agreed(
+    client: &Git,
+    target: &str,
+    options: &ratelgit_lib::git::RemoveOptions,
+) -> ratelgit_lib::error::AppResult<ratelgit_lib::git::RemovalResult> {
+    let preview = client.removal_preview(target)?;
+    let agreed = ratelgit_lib::git::RemoveOptions {
+        seen: ratelgit_lib::git::Seen::of(&preview, options),
+        ..options.clone()
+    };
+    client.remove_worktree(target, &agreed)
+}

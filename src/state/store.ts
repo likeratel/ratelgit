@@ -4,6 +4,7 @@ import { promptAction } from "./dialogs";
 import { describe, EMPTY_HISTORY } from "./helpers";
 import { mutationOperations } from "./mutations";
 import { createQuietRefresh } from "./refresh";
+import { worktreeOperations } from "./worktrees";
 import { projectOperations } from "./projects";
 import { selectionOperations } from "./selection";
 import { createTokens } from "./tokens";
@@ -50,6 +51,8 @@ export function initialData(bridge: Bridge): Data {
     prompt: null,
     switcherOpen: false,
     worktreeParent: null,
+    newWorktree: null,
+    removal: null,
   };
 }
 
@@ -99,6 +102,12 @@ export function createAppStore(bridge: Bridge): AppStore {
       projects.selectWorktree,
       persist,
     );
+    const worktrees = worktreeOperations(set, get, bridge, {
+      execute: mutations.execute,
+      selectWorktree: projects.selectWorktree,
+      refreshWorktree: mutations.refreshWorktree,
+      persist,
+    });
     const refreshQuietly = createQuietRefresh(
       set,
       get,
@@ -112,6 +121,7 @@ export function createAppStore(bridge: Bridge): AppStore {
       ...workspace,
       ...selection,
       ...mutations,
+      ...worktrees,
       refreshQuietly,
       setDraft(text) {
         const path = get().activePath;
@@ -137,8 +147,7 @@ export function createAppStore(bridge: Bridge): AppStore {
       submitPrompt(text) {
         const current = get().prompt;
         set({ prompt: null });
-        const parent = get().worktreeParent?.token ?? null;
-        const next = current ? promptAction(current, text, parent) : null;
+        const next = current ? promptAction(current, text) : null;
         if (next) void mutations.execute(next[0], next[1]);
       },
       dismissPrompt: () => set({ prompt: null }),

@@ -33,6 +33,16 @@ pub struct Project {
     pub worktrees: Vec<Worktree>,
 }
 
+/// A new worktree checked before it is created.
+#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
+#[serde(rename_all = "camelCase")]
+pub struct WorktreePlan {
+    /// The folder the worktree would be created in, when the name is usable.
+    pub path: Option<String>,
+    pub folder_error: Option<String>,
+    pub branch_error: Option<String>,
+}
+
 #[derive(Clone, Debug, PartialEq, Eq, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AddedProject {
@@ -150,23 +160,81 @@ impl Registry {
         parent: Option<&str>,
         name: &str,
     ) -> AppResult<PathBuf> {
-        let folder = self.resolve_worktree(worktree)?;
         let base = match parent {
             Some(token) => lock(&self.parents).get(token).cloned().ok_or_else(|| {
                 AppError::invalid("Choose the folder for the new worktree again.")
             })?,
-            None => {
-                let main = Git::new(&folder)
-                    .worktrees()?
-                    .first()
-                    .map(|t| PathBuf::from(&t.path))
-                    .ok_or_else(|| AppError::not_found("The project has no main worktree."))?;
-                main.parent()
-                    .map(Path::to_path_buf)
-                    .ok_or_else(|| AppError::invalid("The project folder has no parent folder."))?
-            }
+            None => self
+                .main_worktree(worktree)?
+                .parent()
+                .map(Path::to_path_buf)
+                .ok_or_else(|| AppError::invalid("The project folder has no parent folder."))?,
         };
         crate::git::child_folder(&base, name)
+    }
+
+    /// Where a new worktree would go and what is wrong with the names so far.
+    pub fn plan_worktree(
+        &self,
+        worktree: &str,
+        parent: Option<&str>,
+        folder: &str,
+        new_branch: Option<&str>,
+    ) -> AppResult<WorktreePlan> {
+        let git = Git::new(self.resolve_worktree(worktree)?);
+        let (path, folder_error) = match self.worktree_folder(worktree, parent, folder) {
+            Ok(path) => {
+                let filled = std::fs::read_dir(&path).is_ok_and(|mut e| e.next().is_some());
+                let error = (filled || path.is_file()).then(|| {
+                    "A folder with this name already exists and is not empty.".to_string()
+                });
+                (Some(path.to_string_lossy().into_owned()), error)
+            }
+            Err(error) => (None, Some(error.message)),
+        };
+        let branch_error =
+            new_branch.and_then(|name| git.check_new_branch(name).err().map(|e| e.message));
+        Ok(WorktreePlan {
+            path,
+            folder_error,
+            branch_error,
+        })
+    }
+
+    /// Removes `target` through the project of `worktree`.
+    pub fn remove_worktree(
+        &self,
+        worktree: &str,
+        target: &str,
+        options: &crate::git::RemoveOptions,
+    ) -> AppResult<crate::git::RemovalResult> {
+        let main = self.main_worktree(worktree)?;
+        let result = Git::new(&main).remove_worktree(target, options)?;
+        // The removal is done. Re-reading the list is housekeeping: it goes through the
+        // worktree the request came from (the main folder may be a bare repository), and a
+        // failure there must not turn the successful removal into an error.
+        let anchor = if worktree == target {
+            main.to_string_lossy().into_owned()
+        } else {
+            worktree.to_string()
+        };
+        if let Err(error) = self.project_worktrees(&anchor) {
+            log::warn!(
+                "re-reading worktrees after a removal failed: {}",
+                error.message
+            );
+        }
+        Ok(result)
+    }
+
+    /// The main worktree of the project that owns `worktree` (a registered worktree).
+    pub fn main_worktree(&self, worktree: &str) -> AppResult<PathBuf> {
+        let folder = self.resolve_worktree(worktree)?;
+        Git::new(&folder)
+            .worktrees()?
+            .first()
+            .map(|t| PathBuf::from(&t.path))
+            .ok_or_else(|| AppError::not_found("The project has no main worktree."))
     }
 
     pub fn preferences(&self) -> Preferences {

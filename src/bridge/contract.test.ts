@@ -21,6 +21,9 @@ const schemas: Record<string, z.ZodType> = {
   open_file: z.array(types.openResultSchema),
   choose_worktree_parent: z.array(types.chosenParentSchema),
   run_action: z.null(),
+  plan_worktree: z.array(types.worktreePlanSchema),
+  worktree_removal: z.array(types.removalPreviewSchema),
+  remove_worktree: z.array(types.removalResultSchema),
   save_preferences: types.preferencesSchema,
   error: types.appErrorSchema,
 };
@@ -45,6 +48,9 @@ describe("contract with the core", () => {
       expect(parsed.success ? "" : z.prettifyError(parsed.error)).toBe("");
     }
     expect(types.uiPreferencesSchema.safeParse(requests.ui).success).toBe(true);
+    for (const options of requests.removeOptions) {
+      expect(types.removeOptionsSchema.safeParse(options).success).toBe(true);
+    }
     const kinds = new Set(requests.actions.map((a) => a.type));
     const declared = types.actionSchema.options.map((o) => o.shape.type.value);
     expect([...kinds].sort()).toEqual([...new Set(declared)].sort());

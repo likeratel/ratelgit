@@ -22,6 +22,7 @@ import type {
 } from "../types";
 import { reachable, toLine, type FakeCommit } from "./history";
 import { applyFakeAction } from "./actions";
+import { planWorktree, removalPreview, removeWorktree } from "./worktrees";
 import { diffKey } from "./diffs";
 import {
   commitFileDiff,
@@ -43,6 +44,8 @@ export interface FakeControls {
   setLatency(latency: number | ((call: FakeCall) => number)): void;
   /** Makes the next call of `command` fail with this error. */
   failNext(command: string, kind: BridgeErrorKind, message: string): void;
+  /** Network commands such as deleting a remote branch fail while this is on. */
+  setOffline(offline: boolean): void;
   calls(): FakeCall[];
   actions(): Action[];
   reset(): void;
@@ -202,6 +205,7 @@ export function createFakeBridge(
   let latency: number | ((call: FakeCall) => number) = 0;
   let calls: FakeCall[] = [];
   let failures: Record<string, BridgeError> = {};
+  let offline = false;
 
   async function respond<T>(
     command: string,
@@ -228,6 +232,9 @@ export function createFakeBridge(
     },
     failNext: (command, kind, message) => {
       failures = { ...failures, [command]: new BridgeError(kind, message) };
+    },
+    setOffline: (next) => {
+      offline = next;
     },
     calls: () => calls,
     actions: () =>
@@ -324,6 +331,26 @@ export function createFakeBridge(
           ? ("revealed" as const)
           : ("opened" as const),
       })),
+    planWorktree: (worktree, parent, folder, newBranch) =>
+      respond("planWorktree", [worktree, parent, folder, newBranch], () =>
+        planWorktree(world, worktree, parent, folder, newBranch),
+      ),
+    worktreeRemoval: (worktree, target) =>
+      respond("worktreeRemoval", [worktree, target], () =>
+        removalPreview(world, worktree, target),
+      ),
+    removeWorktree: (worktree, target, options) =>
+      respond("removeWorktree", [worktree, target, options], () => {
+        const [next, result] = removeWorktree(
+          world,
+          worktree,
+          target,
+          options,
+          offline,
+        );
+        world = next;
+        return result;
+      }),
     chooseWorktreeParent: () =>
       respond("chooseWorktreeParent", [], () => ({
         token: "parent-1",

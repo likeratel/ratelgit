@@ -205,3 +205,60 @@ test("filter bar states", async ({ page }) => {
   await page.mouse.move(700, 500);
   await shot(page, "n-minimum-many-chips");
 });
+
+test("worktree dialogs", async ({ page }) => {
+  await open(page, "light");
+  await page
+    .locator(".project-row", { hasText: "ratel-web" })
+    .first()
+    .click({ button: "right" });
+  await page.getByRole("menuitem", { name: "New Worktree…" }).click();
+  const add = page.getByRole("dialog", { name: "New worktree" });
+  await add
+    .getByRole("textbox", { name: "Branch name" })
+    .fill("feature/search");
+  await expect(add.getByTestId("worktree-path")).toContainText(
+    "ratel-web-feature-search",
+  );
+  await shot(page, "o-new-worktree");
+  await add.getByRole("button", { name: "Add Worktree" }).click();
+  await expect(add).toHaveCount(0);
+
+  const clean = page
+    .getByTestId("worktree-row")
+    .filter({ hasText: "ratel-web-feature-search" });
+  await clean.click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Remove Worktree…" }).click();
+  await expect(page.getByRole("dialog")).toContainText(
+    "Also delete local branch",
+  );
+  await page.waitForTimeout(300);
+  await shot(page, "p-remove-clean");
+  await page.getByRole("button", { name: "Cancel" }).click();
+
+  const dark = page
+    .getByTestId("worktree-row")
+    .filter({ hasText: "ratel-web-dark" });
+  await dark.click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Remove Worktree…" }).click();
+  await page
+    .getByRole("checkbox", { name: /Also delete remote branch/ })
+    .check();
+  await expect(page.getByRole("dialog")).toContainText(
+    "once the remote branch is deleted too",
+  );
+  await page.waitForTimeout(300);
+  await shot(page, "r-remove-remote-warning");
+  await page.getByRole("button", { name: "Cancel" }).click();
+
+  await page.emulateMedia({ colorScheme: "dark" });
+  const login = page
+    .getByTestId("worktree-row")
+    .filter({ hasText: "ratel-web-login" });
+  await login.click({ button: "right" });
+  await page.getByRole("menuitem", { name: "Remove Worktree…" }).click();
+  await expect(page.getByRole("dialog")).toContainText("I understand");
+  await page.waitForTimeout(300);
+  await expect(page.getByRole("dialog")).toBeVisible();
+  await shot(page, "q-remove-warnings-dark");
+});

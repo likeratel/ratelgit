@@ -15,7 +15,7 @@ use std::collections::{BTreeMap, BTreeSet};
 use std::path::{Path, PathBuf};
 
 use common::*;
-use ratelgit_lib::git::{Action, ChangeKind, ChangedFile, CommitInfo, Git, Scope};
+use ratelgit_lib::git::{Action, ChangeKind, ChangedFile, CommitInfo, Git, RemoveOptions, Scope};
 use ratelgit_lib::projects::Registry;
 use ratelgit_lib::snapshot;
 use ratelgit_lib::store::{Preferences, Store, UiPreferences};
@@ -168,6 +168,18 @@ fn samples(root: &Path) -> Value {
         ],
         "open_file": [json!({ "action": "opened" }), json!({ "action": "revealed" })],
         "choose_worktree_parent": [json!({ "token": "parent-1", "path": "/work" }), Value::Null],
+        "plan_worktree": [
+            to_json(&registry.plan_worktree(&git_path(&repo), None, "sample-next", Some("next")).unwrap()),
+            to_json(&registry.plan_worktree(&git_path(&repo), None, "a/b", Some("main")).unwrap()),
+        ],
+        "worktree_removal": [
+            to_json(&client.removal_preview(&git_path(&linked)).unwrap()),
+            to_json(&client.removal_preview(&git_path(&repo)).unwrap()),
+        ],
+        "remove_worktree": [
+            json!({ "branchDeleted": true, "remoteDeleted": false, "problem": "The worktree and the local branch were removed, but deleting the remote branch origin/x failed: offline" }),
+            json!({ "branchDeleted": null, "remoteDeleted": null, "problem": null }),
+        ],
         "run_action": Value::Null,
         "save_preferences": to_json(&saved),
         "error": to_json(&error),
@@ -210,6 +222,10 @@ fn every_request_the_ui_sends_is_accepted() {
     for file in requests["files"].as_array().unwrap() {
         serde_json::from_value::<ChangedFile>(file.clone())
             .unwrap_or_else(|error| panic!("{file}: {error}"));
+    }
+    for options in requests["removeOptions"].as_array().unwrap() {
+        serde_json::from_value::<RemoveOptions>(options.clone())
+            .unwrap_or_else(|error| panic!("{options}: {error}"));
     }
     let ui = requests["ui"].clone();
     serde_json::from_value::<UiPreferences>(ui).unwrap();

@@ -263,3 +263,16 @@
   display: inline-flex;
   color: var(--accent);
 }
+
+.hover-add {
+  opacity: 0;
+}
+
+.project-row:hover .hover-add,
+.hover-add:focus-visible {
+  opacity: 1;
+}
+
+.worktree-row.unavailable {
+  opacity: 0.55;
+}

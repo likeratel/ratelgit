@@ -207,3 +207,156 @@
   flex: 1;
   font-size: var(--text-sm);
 }
+
+.worktree-dialog .dialog-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.worktree-dialog .dialog-body h2 {
+  margin-bottom: 0;
+}
+
+.dialog-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  font-size: var(--text-sm);
+  color: var(--text-muted);
+}
+
+.field > span:first-child {
+  font-weight: 600;
+}
+
+.input[aria-invalid="true"] {
+  border-color: var(--danger);
+}
+
+.field-error {
+  color: var(--danger);
+  font-size: var(--text-xs);
+}
+
+.ref-picker {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.ref-picker .search-field {
+  flex: none;
+}
+
+.ref-picker-list {
+  height: 132px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  background: var(--surface-sunken);
+}
+
+.ref-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  width: 100%;
+  height: 24px;
+  padding: 0 6px;
+  border-radius: 4px;
+  text-align: left;
+  font-size: var(--text-sm);
+  color: var(--text);
+}
+
+.ref-picker-item:hover {
+  background: var(--hover);
+}
+
+.ref-picker-item.selected {
+  background: var(--selection);
+}
+
+.ref-picker-check {
+  width: 14px;
+  flex: none;
+  color: var(--accent);
+}
+
+.ref-picker-item .faint {
+  margin-left: auto;
+}
+
+.path-preview {
+  margin: 0;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+  overflow-wrap: anywhere;
+}
+
+.removal-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.removal-options .checkbox {
+  align-items: flex-start;
+  white-space: normal;
+  color: var(--text);
+}
+
+.removal-options .checkbox input {
+  margin-top: 2px;
+}
+
+.checkbox.disabled {
+  color: var(--text-muted);
+}
+
+.option-note {
+  display: block;
+  font-size: var(--text-xs);
+  color: var(--text-muted);
+}
+
+.removal-warnings {
+  display: flex;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: var(--radius-md);
+  background: var(--danger-soft);
+  color: var(--danger);
+  font-size: var(--text-sm);
+}
+
+.removal-warnings svg {
+  flex: none;
+  margin-top: 2px;
+}
+
+.removal-warnings ul {
+  margin: 0 0 8px;
+  padding-left: 16px;
+  color: var(--text);
+}
+
+.removal-warnings .checkbox {
+  color: var(--text);
+  white-space: normal;
+}
+
+.field-value {
+  margin-left: 4px;
+  font-weight: 500;
+  color: var(--accent-text);
+}

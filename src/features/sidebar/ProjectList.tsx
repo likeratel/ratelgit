@@ -42,16 +42,33 @@ function TreeBadges({ tree }: { tree: Worktree }) {
 
 function WorktreeRow({ tree, active }: { tree: Worktree; active: boolean }) {
   const selectWorktree = useApp((s) => s.selectWorktree);
+  const openRemove = useApp((s) => s.openRemoveWorktree);
+  const busy = useApp((s) => s.mutation !== null);
+  const openMenu = useContextMenu();
   const Icon = active ? FolderOpen : Folder;
   return (
     <button
       type="button"
-      className={`sidebar-row worktree-row${active ? " selected" : ""}`}
+      className={`sidebar-row worktree-row${active ? " selected" : ""}${tree.unavailable ? " unavailable" : ""}`}
       aria-current={active ? "true" : undefined}
-      disabled={tree.unavailable}
+      aria-disabled={tree.unavailable || undefined}
       title={tree.path}
       data-testid="worktree-row"
-      onClick={() => selectWorktree(tree.path)}
+      onClick={() => !tree.unavailable && selectWorktree(tree.path)}
+      onContextMenu={(event) =>
+        openMenu(event, [
+          tree.isMain
+            ? { label: "Main Worktree Cannot Be Removed", disabled: true }
+            : {
+                label: tree.unavailable
+                  ? "Clean Up Missing Worktree…"
+                  : "Remove Worktree…",
+                destructive: true,
+                disabled: busy,
+                onSelect: () => void openRemove(tree),
+              },
+        ])
+      }
     >
       <Icon size={15} className="row-icon accent" />
       <span className="worktree-text">
@@ -76,9 +93,15 @@ function ProjectRow({
 }) {
   const selectProject = useApp((s) => s.selectProject);
   const removeProject = useApp((s) => s.removeProject);
+  const openNewWorktree = useApp((s) => s.openNewWorktree);
   const busy = useApp((s) => s.mutation !== null);
   const openMenu = useContextMenu();
   const unavailable = project.state === "unavailable";
+  // The dialog works on the selected worktree, so select the project first.
+  const newWorktree = () => {
+    selectProject(project.path);
+    openNewWorktree(null);
+  };
   return (
     <div
       className={`sidebar-row project-row${unavailable ? " unavailable" : ""}`}
@@ -88,7 +111,13 @@ function ProjectRow({
       onContextMenu={(event) =>
         openMenu(event, [
           {
+            label: "New Worktree…",
+            disabled: busy || unavailable,
+            onSelect: newWorktree,
+          },
+          {
             label: "Remove from List",
+            separator: true,
             disabled: busy,
             onSelect: () => void removeProject(project.path),
           },
@@ -117,6 +146,18 @@ function ProjectRow({
         <span className="truncate project-name">{project.name}</span>
       </button>
       <span className="row-trailing">
+        {project.state === "ready" ? (
+          <button
+            type="button"
+            className="icon-button hover-add"
+            title="New worktree"
+            aria-label={`New worktree in ${project.name}`}
+            disabled={busy}
+            onClick={newWorktree}
+          >
+            <Plus size={14} />
+          </button>
+        ) : null}
         {project.state === "loading" ? (
           <span className="spinner" aria-label="Loading" />
         ) : null}

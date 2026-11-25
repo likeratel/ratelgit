@@ -2,6 +2,8 @@ import { useState } from "react";
 import { useApp } from "../../state/context";
 import type { Confirmation, Prompt } from "../../state/types";
 import { Modal } from "../../ui/Modal";
+import { NewWorktreeDialog } from "../worktrees/NewWorktreeDialog";
+import { RemoveWorktreeDialog } from "../worktrees/RemoveWorktreeDialog";
 
 function ConfirmDialog({ confirmation }: { confirmation: Confirmation }) {
   const run = useApp((s) => s.runConfirmation);
@@ -30,27 +32,6 @@ function ConfirmDialog({ confirmation }: { confirmation: Confirmation }) {
         </button>
       </div>
     </Modal>
-  );
-}
-
-/** Where a new worktree goes: next to the project, or a folder picked in the native dialog. */
-function WorktreeFolder() {
-  const parent = useApp((s) => s.worktreeParent);
-  const choose = useApp((s) => s.chooseWorktreeParent);
-  return (
-    <div className="prompt-folder">
-      <span className="muted small-text">In</span>
-      <span className="truncate prompt-folder-path" title={parent?.path}>
-        {parent ? parent.path : "The folder that contains the project"}
-      </span>
-      <button
-        type="button"
-        className="button small"
-        onClick={() => void choose()}
-      >
-        Choose Folder…
-      </button>
-    </div>
   );
 }
 
@@ -95,7 +76,6 @@ function PromptDialog({ prompt }: { prompt: Prompt }) {
               onFocus={(event) => event.target.select()}
             />
           )}
-          {prompt.kind === "addWorktree" ? <WorktreeFolder /> : null}
         </div>
         <div className="dialog-actions">
           <button type="button" className="button" onClick={dismiss}>
@@ -113,8 +93,18 @@ function PromptDialog({ prompt }: { prompt: Prompt }) {
 export function Dialogs() {
   const confirmation = useApp((s) => s.confirmation);
   const prompt = useApp((s) => s.prompt);
+  const newWorktree = useApp((s) => s.newWorktree);
+  const removal = useApp((s) => s.removal);
   return (
     <>
+      {newWorktree ? <NewWorktreeDialog start={newWorktree.reference} /> : null}
+      {removal ? (
+        <RemoveWorktreeDialog
+          key={removal.round}
+          tree={removal.tree}
+          preview={removal.preview}
+        />
+      ) : null}
       {confirmation ? <ConfirmDialog confirmation={confirmation} /> : null}
       {prompt ? <PromptDialog key={prompt.title} prompt={prompt} /> : null}
     </>

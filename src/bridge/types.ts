@@ -226,6 +226,68 @@ export const appErrorSchema = z.strictObject({
 const fileArg = changedFileSchema;
 const ref = z.string().startsWith("refs/");
 const stashArg = { stash: z.string(), revision: z.string() };
+export const worktreeBranchSchema = z.discriminatedUnion("type", [
+  z.strictObject({
+    type: z.literal("new"),
+    name: z.string(),
+    startPoint: z.string(),
+  }),
+  z.strictObject({ type: z.literal("existing"), reference: ref }),
+  z.strictObject({ type: z.literal("remote"), reference: ref }),
+]);
+
+export const worktreePlanSchema = z.strictObject({
+  path: z.string().nullable(),
+  folderError: z.string().nullable(),
+  branchError: z.string().nullable(),
+});
+
+export const removalPreviewSchema = z.strictObject({
+  path: z.string(),
+  branch: z.string().nullable(),
+  isMain: z.boolean(),
+  prunable: z.boolean(),
+  locked: z.string().nullable(),
+  operation: operationSchema.nullable(),
+  changes: z.number().int(),
+  untracked: z.number().int(),
+  unmergedCommits: z.number().int(),
+  unmergedWithRemote: z.number().int(),
+  ignored: z.number().int(),
+  ignoredExamples: z.array(z.string()),
+  submodules: z.boolean(),
+  upstream: z.strictObject({ remote: z.string(), name: z.string() }).nullable(),
+  remoteBlock: z.string().nullable(),
+  branchBlock: z.string().nullable(),
+  tip: z.string().nullable(),
+});
+
+/** The losses the dialog showed; the core refuses the removal if more would be lost now. */
+export const seenSchema = z.strictObject({
+  changes: z.number().int(),
+  untracked: z.number().int(),
+  ignored: z.number().int(),
+  lostCommits: z.number().int(),
+  locked: z.boolean(),
+  operation: z.boolean(),
+  submodules: z.boolean(),
+  tip: z.string().nullable(),
+});
+
+export const removeOptionsSchema = z.strictObject({
+  force: z.boolean(),
+  deleteBranch: z.boolean(),
+  allowUnmerged: z.boolean(),
+  deleteRemote: z.boolean(),
+  seen: seenSchema,
+});
+
+export const removalResultSchema = z.strictObject({
+  branchDeleted: z.boolean().nullable(),
+  remoteDeleted: z.boolean().nullable(),
+  problem: z.string().nullable(),
+});
+
 export const chunkChoiceSchema = z.enum([
   "ours",
   "theirs",
@@ -262,9 +324,9 @@ export const actionSchema = z.discriminatedUnion("type", [
   z.strictObject({ type: z.literal("rebase"), reference: ref }),
   z.strictObject({
     type: z.literal("addWorktree"),
-    reference: ref,
+    branch: worktreeBranchSchema,
     parent: z.string().nullable(),
-    name: z.string(),
+    folder: z.string(),
   }),
   z.strictObject({ type: z.literal("stash"), message: z.string() }),
   z.strictObject({ type: z.literal("applyStash"), ...stashArg }),
@@ -324,4 +386,9 @@ export type AddedProject = z.infer<typeof addedProjectSchema>;
 export type ErrorKind = z.infer<typeof errorKindSchema>;
 export type Action = z.infer<typeof actionSchema>;
 export type OpenResult = z.infer<typeof openResultSchema>;
+export type WorktreeBranch = z.infer<typeof worktreeBranchSchema>;
+export type WorktreePlan = z.infer<typeof worktreePlanSchema>;
+export type RemovalPreview = z.infer<typeof removalPreviewSchema>;
+export type RemoveOptions = z.infer<typeof removeOptionsSchema>;
+export type RemovalResult = z.infer<typeof removalResultSchema>;
 export type ChosenParent = z.infer<typeof chosenParentSchema>;

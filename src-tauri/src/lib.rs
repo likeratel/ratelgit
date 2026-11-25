@@ -44,6 +44,9 @@ pub fn run() {
             commands::load_conflict,
             commands::open_file,
             commands::choose_worktree_parent,
+            commands::plan_worktree,
+            commands::worktree_removal,
+            commands::remove_worktree,
         ])
         .run(tauri::generate_context!());
     if let Err(error) = result {

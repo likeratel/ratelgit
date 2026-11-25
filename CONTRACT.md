@@ -122,6 +122,34 @@ interface ConflictDocument {
   segments: Segment[];        // empty unless ready or noMarkers
 }
 
+interface RemovalPreview {
+  path: string; branch: string | null; isMain: boolean;
+  prunable: boolean;         // folder gone: removing only cleans up Git's record (`worktree prune`)
+  locked: string | null;     // lock reason ("" when none given)
+  operation: Operation | null;
+  changes: number;           // changed tracked files that would be lost
+  untracked: number;         // untracked files that would be lost
+  unmergedCommits: number;   // commits on no other branch, remote branch or tag
+  unmergedWithRemote: number; // the same, when the upstream remote branch is deleted too
+  ignored: number;           // ignored files and folders deleted with it (a folder counts once)
+  ignoredExamples: string[]; // up to three of their names
+  submodules: boolean;       // contains submodules; Git removes it only with force
+  upstream: { remote: string; name: string } | null;
+  remoteBlock: string | null; // why the remote branch must stay: another name than the local
+                             // branch, or the remote's default branch (HEAD, main, master)
+  branchBlock: string | null; // why the local branch must stay (default branch, checked out elsewhere)
+  tip: string | null;        // branch commit (or detached HEAD) when the preview was made
+}
+interface RemoveOptions {
+  force: boolean; deleteBranch: boolean; allowUnmerged: boolean; deleteRemote: boolean;
+  seen: {                    // what the dialog showed and the user agreed to lose
+    changes: number; untracked: number; ignored: number;
+    lostCommits: number;     // commits lost with the chosen deletions
+    locked: boolean; operation: boolean; submodules: boolean; tip: string | null;
+  };
+}
+interface RemovalResult { branchDeleted: boolean | null; remoteDeleted: boolean | null; problem: string | null; }
+
 interface UiPreferences {
   diffLayout: "unified" | "split";
   ignoreWhitespace: boolean;
@@ -171,6 +199,9 @@ renamed to `ratelgit.json.corrupt` instead of being overwritten.
 | `load_diff` | `{ worktree, file: ChangedFile, commit: string \| null, ignoreWhitespace }` | `FileDiff` | `commit` is required for `committed` files. |
 | `load_conflict` | `{ worktree, path }` | `ConflictDocument` | Only for a file that is conflicted now (`stale` otherwise). Reads the work-tree file; never writes. Nested, unbalanced or ambiguous markers give `malformed`; a `|||||||` line counts as a base marker only when `merge.conflictStyle` is `diff3` or `zdiff3`. |
 | `open_file` | `{ worktree, path }` | `{ action: "opened" \| "revealed" }` | Only for a file that is conflicted now, inside the worktree, not a link and not under `.git/`. Files that could run something when opened (script and program extensions, or the executable bit) are only revealed in the file manager. |
+| `plan_worktree` | `{ worktree, parent: string \| null, folder, newBranch: string \| null }` | `{ path: string \| null; folderError: string \| null; branchError: string \| null }` | Checks names while they are typed; `addWorktree` checks again. |
+| `worktree_removal` | `{ worktree, target }` | `RemovalPreview` | What removing `target` would delete. `target` must be in the `git worktree list` of the project that owns `worktree`. |
+| `remove_worktree` | `{ worktree, target, options: RemoveOptions }` | `RemovalResult` | See below. |
 | `choose_worktree_parent` | – | `{ token: string; path: string } \| null` | Native folder picker in the core for the folder that holds a new worktree. `null` when cancelled. `path` is for display; `addWorktree` takes the token. UNC and `\\?\` paths are refused. |
 | `run_action` | `{ worktree, action: Action }` | `null` | See below. The UI reloads the worktree afterwards, also after a failure. |
 | `save_preferences` | `{ filters, ui }` | `Preferences` | |
@@ -191,9 +222,12 @@ type Action =
   | { type: "switchBranch" | "checkoutRemote" | "merge" | "rebase"; reference: string }
   | { type: "renameBranch"; reference: string; name: string }
   | { type: "deleteBranch"; reference: string; force: boolean } // not_fully_merged without force
-  | { type: "addWorktree"; reference: string; parent: string | null; name: string }
+  | { type: "addWorktree"; parent: string | null; folder: string;
+      branch: { type: "new"; name: string; startPoint: string }   // full ref or "HEAD"; no tracking
+            | { type: "existing"; reference: string }             // refs/heads/…, not checked out
+            | { type: "remote"; reference: string } }             // refs/remotes/…, tracked
       // `parent`: token from choose_worktree_parent, or null for the folder containing the
-      // project; `name`: one plain folder name. The UI never sends a folder path.
+      // project; `folder`: one plain folder name. The UI never sends a folder path.
   | { type: "stash"; message: string }
   | { type: "applyStash" | "dropStash"; stash: string /* "stash@{n}" */; revision: string }
   | { type: "abort"; operation: Operation }
@@ -225,6 +259,22 @@ type Action =
 - Commit and merge messages are committed as given (`--cleanup=whitespace`), so lines such as
   `#123 fix login` stay. Git's own comment lines (`# Conflicts:`, `#\tfile`) are taken out of
   the prepared merge message before it is offered.
+- `remove_worktree` refuses the main worktree and paths outside the project's worktree list, and
+  checks consent before touching anything: `force` for changes, untracked or ignored files,
+  submodules, a stopped operation or a lock; `allowUnmerged` when commits would be on no ref
+  afterwards (counting the remote branch as gone when `deleteRemote` is set, and a detached
+  HEAD's own commits); no `deleteBranch` when `branchBlock` is set; `deleteRemote` only with
+  `deleteBranch`, an upstream and no `remoteBlock`. A worktree whose folder is gone is cleaned
+  up on its own (`git worktree remove`), leaving other missing worktrees alone.
+- Right before removing, the core reads the preview again. If more would be lost than `seen`
+  says (more files or commits, a new kind of loss, or a moved branch tip), it refuses with
+  `stale` and the UI shows the dialog again with the new numbers. The flags alone never remove
+  anything.
+- The remote branch is deleted with `--force-with-lease` against the last fetched
+  `<remote>/<name>`; if the remote moved since, it is kept and `problem` says so. It then runs
+  `git worktree remove` (Git deletes the folder), `git branch -D`, and `git push --delete` (a
+  network command), each only after the previous one worked. A later failure is not an error:
+  the result's `problem` says which steps were done.
 - `pull` is fast-forward only; `pull` and `push` use the branch's upstream and fail without one.
 - Git runs with `LC_ALL=C`, `GIT_TERMINAL_PROMPT=0`, `GCM_INTERACTIVE=never` and no editor, so
   credential prompts fail instead of waiting. Settings that change parsed output or start

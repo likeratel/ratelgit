@@ -1,5 +1,9 @@
 import type {
   Action,
+  RemovalPreview,
+  RemovalResult,
+  RemoveOptions,
+  WorktreePlan,
   ChosenParent,
   OpenResult,
   AddedProject,
@@ -47,6 +51,18 @@ export interface Bridge {
   loadConflict(worktree: string, path: string): Promise<ConflictDocument>;
   openFile(worktree: string, path: string): Promise<OpenResult>;
   chooseWorktreeParent(): Promise<ChosenParent>;
+  planWorktree(
+    worktree: string,
+    parent: string | null,
+    folder: string,
+    newBranch: string | null,
+  ): Promise<WorktreePlan>;
+  worktreeRemoval(worktree: string, target: string): Promise<RemovalPreview>;
+  removeWorktree(
+    worktree: string,
+    target: string,
+    options: RemoveOptions,
+  ): Promise<RemovalResult>;
   runAction(worktree: string, action: Action): Promise<void>;
   savePreferences(
     filters: Record<string, readonly string[]>,

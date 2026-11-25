@@ -2,6 +2,11 @@ import type {
   Action,
   Bridge,
   ChosenParent,
+  RemovalPreview,
+  RemoveOptions,
+  Worktree,
+  WorktreeBranch,
+  WorktreePlan,
   ChangedFile,
   ChunkChoice,
   CommitInfo,
@@ -52,8 +57,7 @@ export interface Confirmation {
   destructive: boolean;
 }
 
-export type PromptKind =
-  "createBranch" | "stash" | "rename" | "addWorktree" | "mergeMessage";
+export type PromptKind = "createBranch" | "stash" | "rename" | "mergeMessage";
 
 export interface Prompt {
   kind: PromptKind;
@@ -100,6 +104,15 @@ export interface Data {
   switcherOpen: boolean;
   /** Folder picked in the core for the next new worktree. */
   worktreeParent: ChosenParent;
+  /** The new-worktree dialog, with a branch to start from when opened from a branch. */
+  newWorktree: { reference: Reference | null } | null;
+  /** The remove-worktree dialog; `preview` is null while it is read. */
+  /** `round` grows each time the preview is read again, which resets the dialog's choices. */
+  removal: {
+    tree: Worktree;
+    preview: RemovalPreview | null;
+    round: number;
+  } | null;
 }
 
 export interface Operations {
@@ -142,6 +155,18 @@ export interface Operations {
   /** Re-reads the worktree without disturbing selection, drafts or loaded pages. */
   refreshQuietly(): Promise<void>;
   dismissNotice(): void;
+  openNewWorktree(reference: Reference | null): void;
+  closeNewWorktree(): void;
+  /** Checks names as they are typed; `null` when the check could not run. */
+  planWorktree(
+    parent: string | null,
+    folder: string,
+    newBranch: string | null,
+  ): Promise<WorktreePlan | null>;
+  addWorktree(branch: WorktreeBranch, folder: string): Promise<void>;
+  openRemoveWorktree(tree: Worktree): Promise<void>;
+  closeRemoveWorktree(): void;
+  removeWorktree(options: RemoveOptions): Promise<void>;
 }
 
 export type AppState = Data & Operations;

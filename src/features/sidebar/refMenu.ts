@@ -1,6 +1,5 @@
 import type { Reference } from "../../bridge";
 import {
-  addWorktreePrompt,
   deleteBranchConfirmation,
   dropStashConfirmation,
   renamePrompt,
@@ -64,9 +63,7 @@ export function referenceMenu(
           label: "Check Out in New Worktree…",
           separator: true,
           disabled: reference.worktreePath !== null || !state.projectPath,
-          onSelect: () =>
-            state.projectPath &&
-            state.ask(addWorktreePrompt(reference, state.projectPath)),
+          onSelect: () => state.openNewWorktree(reference),
         },
         {
           label: "Rename…",
@@ -89,6 +86,10 @@ export function referenceMenu(
             { type: "checkoutRemote", reference: reference.id },
             "Check Out",
           ),
+        },
+        {
+          label: "Check Out in New Worktree…",
+          onSelect: () => state.openNewWorktree(reference),
         },
         ...filterItems,
       ];

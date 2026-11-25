@@ -116,9 +116,11 @@ fn add_worktree_and_check_out_remote_branch() {
     let unresolved = act(
         &client,
         Action::AddWorktree {
-            reference: "refs/heads/side".into(),
+            branch: ratelgit_lib::git::WorktreeBranch::Existing {
+                reference: "refs/heads/side".into(),
+            },
             parent: None,
-            name: "x".into(),
+            folder: "x".into(),
         },
     );
     assert_eq!(unresolved.unwrap_err().kind, ErrorKind::InvalidInput);

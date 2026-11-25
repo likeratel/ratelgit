@@ -7,6 +7,7 @@ import type { FakeCommit } from "./history";
 import { diffKey } from "./diffs";
 import { findTree, type FakeTree, type FakeWorld } from "./world";
 import { applyWorkingAction } from "./working";
+import { addWorktree } from "./worktrees";
 
 type TreeChange = (tree: FakeTree) => FakeTree;
 
@@ -177,6 +178,8 @@ export function applyFakeAction(
   const changed = conflictChange(tree, action);
   if (changed) return updateTree(world, path, () => changed);
   switch (action.type) {
+    case "addWorktree":
+      return addWorktree(world, path, action);
     case "commit":
       if (!action.message.trim())
         throw new BridgeError("invalid_input", "Enter a commit message.");

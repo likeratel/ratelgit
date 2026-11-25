@@ -12,6 +12,7 @@ use super::operation::Operation;
 use super::patch::FilePatch;
 use super::runner::{Git, RunOptions};
 use super::validate;
+use super::worktree_ops::WorktreeBranch;
 use crate::error::{AppError, AppResult};
 
 const MAX_SELECTED_LINES: usize = 1_000_000;
@@ -78,12 +79,12 @@ pub enum Action {
     Abort {
         operation: Operation,
     },
-    /// `parent` is a folder token from `choose_worktree_parent`, or `None` for the folder that
-    /// contains the project; `name` is the new folder's name.
+    /// A new worktree in folder `folder` inside `parent` (a token from
+    /// `choose_worktree_parent`, or `None` for the folder that contains the project).
     AddWorktree {
-        reference: String,
+        branch: WorktreeBranch,
         parent: Option<String>,
-        name: String,
+        folder: String,
     },
     Stash {
         message: String,

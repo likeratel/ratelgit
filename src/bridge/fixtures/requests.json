@@ -111,12 +111,6 @@
       "operation": "rebase"
     },
     {
-      "type": "addWorktree",
-      "reference": "refs/heads/side",
-      "parent": null,
-      "name": "sample-side"
-    },
-    {
       "type": "stash",
       "message": ""
     },
@@ -218,9 +212,31 @@
     },
     {
       "type": "addWorktree",
-      "reference": "refs/heads/side",
+      "branch": {
+        "type": "new",
+        "name": "topic/next",
+        "startPoint": "refs/remotes/origin/main"
+      },
+      "parent": null,
+      "folder": "sample-topic-next"
+    },
+    {
+      "type": "addWorktree",
+      "branch": {
+        "type": "existing",
+        "reference": "refs/heads/side"
+      },
       "parent": "parent-1",
-      "name": "side"
+      "folder": "side"
+    },
+    {
+      "type": "addWorktree",
+      "branch": {
+        "type": "remote",
+        "reference": "refs/remotes/origin/feature/x"
+      },
+      "parent": null,
+      "folder": "sample-feature-x"
     }
   ],
   "files": [
@@ -250,5 +266,39 @@
     "historySplit": 0.5,
     "changesSplit": 0.42,
     "lastWorktree": null
-  }
+  },
+  "removeOptions": [
+    {
+      "force": false,
+      "deleteBranch": true,
+      "allowUnmerged": false,
+      "deleteRemote": false,
+      "seen": {
+        "changes": 0,
+        "untracked": 0,
+        "ignored": 0,
+        "lostCommits": 0,
+        "locked": false,
+        "operation": false,
+        "submodules": false,
+        "tip": "0123456789abcdef0123456789abcdef01234567"
+      }
+    },
+    {
+      "force": true,
+      "deleteBranch": true,
+      "allowUnmerged": true,
+      "deleteRemote": true,
+      "seen": {
+        "changes": 2,
+        "untracked": 1,
+        "ignored": 3,
+        "lostCommits": 1,
+        "locked": true,
+        "operation": true,
+        "submodules": true,
+        "tip": null
+      }
+    }
+  ]
 }

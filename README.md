@@ -87,6 +87,8 @@ On Windows every `⌘` shortcut uses `Ctrl` instead.
 - Switching a worktree reloads the graph, branches, changed files and upstream status for that checkout, and only the last worktree you picked reaches the screen, however fast you switch.
 - When the window gets focus back, the selected worktree and the sidebar counts are read again quietly, so changes made in a terminal or editor show up. Your selection, draft and scroll position stay.
 - The last worktree you used opens again at launch. A commit message draft stays with its worktree while the app is open.
+- **New Worktree…** (the `+` on a project row, or its context menu) creates a worktree on a new branch, starting from `origin/main`, `origin/master` or HEAD by default or any branch or tag you search for, or on an existing local or remote branch. The folder name follows the branch name, the full path is shown before you confirm, and a taken branch or folder name is flagged as you type. The new worktree is selected right away.
+- **Remove Worktree…** on a worktree row's context menu shows exactly what goes: the folder and the branch checked out in it. The local branch is deleted too by default (not when it is the project's default branch or checked out elsewhere); the remote branch only if you tick it. Uncommitted, untracked and ignored files (such as `.env`), commits that are on no other branch, submodules, a stopped merge or rebase, or a lock are listed, and you confirm that you understand they will be lost. A remote branch with another name than the local branch, or the remote's default branch, is never deleted. Git deletes the folder; if a later step fails, for example the remote branch while offline, the app says which steps were done. The main worktree cannot be removed, and a worktree whose folder is already gone is only cleaned up.
 - `⌘P` opens a quick switcher: fuzzy-match projects, worktrees and the branches of the current project with the keyboard (`↑` `↓`, `Return`, `Esc`). Picking a branch filters History to it.
 
 ### History
@@ -134,7 +136,7 @@ On Windows every `⌘` shortcut uses `Ctrl` instead.
 ### Branches, stashes and remotes
 
 - Local branches and remote branches are shown as folder trees split on `/`; each remote is a top-level folder. The branch checked out in the current worktree is highlighted, and a branch checked out in another worktree carries an icon whose tooltip names that worktree.
-- Local branch menu: Check Out, Merge into the current branch, Rebase the current branch onto it, Check Out in New Worktree…, Rename…, Delete…, and filters. A new worktree goes into a folder you name, next to the project or inside a folder you pick in the system's folder dialog. Deleting asks first, and a branch that is not fully merged needs a second, separate confirmation to force it.
+- Local branch menu: Check Out, Merge into the current branch, Rebase the current branch onto it, Check Out in New Worktree… (opens New Worktree with that branch), Rename…, Delete…, and filters. Deleting asks first, and a branch that is not fully merged needs a second, separate confirmation to force it.
 - Remote branch menu: check it out as a local tracking branch, or filter. Tags can be filtered.
 - Stash menu: Apply (by commit ID, so a shifted stash index cannot apply the wrong one) and Drop… with confirmation.
 - Create a branch from HEAD or stash changes from the **⋯** menu. Fetch, Pull and Push sit in the top bar.
@@ -165,6 +167,7 @@ Shortcuts are matched on the physical key, so they keep working with a Korean or
 - Hunk and line staging works on tracked UTF-8 text files. Untracked and new files are staged whole. When the last line of a file has no newline at its end, the lines around it can only be staged together; ratelgit says so and the hunk button still works. A mode change (such as the executable bit) is staged only with the whole file.
 - Conflict chunks are read with the standard 7-character markers; a custom `conflict-marker-size` attribute is not supported. There is no built-in editor for the resolved text: open the file in your editor instead. A rebase step cannot be skipped from the app.
 - A cherry-pick or revert whose result is empty cannot be continued from the app: there the only option is **Abort**. To keep it, finish it in a terminal with `git cherry-pick --skip` or `git commit --allow-empty`. A `git am` session in progress is not shown.
+- Removing a worktree's remote branch works from what the last fetch saw: if someone pushed to it since, it is not deleted, and the app asks you to fetch and check again. A remote whose default branch is not recorded (`<remote>/HEAD`) and is not called `main` or `master` is not recognised as the default, so that branch is protected only by being named differently from your local branch.
 - In a partial clone (for example `git clone --filter=blob:none`), file contents that have not been downloaded yet cannot be shown, because ratelgit never fetches while reading. The diff area says so; fetch them in a terminal.
 - Merge and Rebase are offered on local branches only.
 - Commit message drafts live only while the app is open.

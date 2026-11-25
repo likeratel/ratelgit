@@ -3,7 +3,6 @@ import type { Bridge } from "../bridge";
 import { createFakeBridge } from "../bridge/fake/fakeBridge";
 import { WEB, WEB_LOGIN } from "../bridge/fake/world";
 import { changedLinesIn, parsePatch } from "../lib/patch";
-import { addWorktreePrompt } from "./dialogs";
 import { createAppStore, type AppStore } from "./store";
 
 async function started(
@@ -200,17 +199,23 @@ describe("drafts, worktrees and focus", () => {
     const branch = store
       .getState()
       .references.find((r) => r.id === "refs/heads/feature/auth/oauth")!;
-    store.getState().ask(addWorktreePrompt(branch, WEB));
+    store.getState().openNewWorktree(branch);
     await store.getState().chooseWorktreeParent();
     expect(store.getState().worktreeParent?.path).toBe("/work/trees");
-    store.getState().submitPrompt("ratel-web-oauth");
+    await store
+      .getState()
+      .addWorktree(
+        { type: "existing", reference: branch.id },
+        "ratel-web-oauth",
+      );
     await idle(store);
     expect(fake.controls.actions().at(-1)).toEqual({
       type: "addWorktree",
-      reference: branch.id,
+      branch: { type: "existing", reference: branch.id },
       parent: "parent-1",
-      name: "ratel-web-oauth",
+      folder: "ratel-web-oauth",
     });
+    expect(store.getState().activePath).toBe("/work/trees/ratel-web-oauth");
   });
 
   it("refreshes quietly when the window comes back", async () => {

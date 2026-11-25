@@ -14,6 +14,7 @@ mod refs;
 mod runner;
 mod status;
 pub mod validate;
+mod worktree_ops;
 
 pub use actions::{Action, LineOperation};
 pub use branches::{child_folder, is_unc, local_branch_name};
@@ -26,3 +27,6 @@ pub use operation::{Operation, OperationState};
 pub use patch::FilePatch;
 pub use refs::folder_name;
 pub use runner::{Git, RunOptions, DEFAULT_OUTPUT_LIMIT};
+pub use worktree_ops::{
+    commits_lost, RemoteBranch, RemovalPreview, RemovalResult, RemoveOptions, Seen, WorktreeBranch,
+};
