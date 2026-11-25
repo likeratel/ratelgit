@@ -10,6 +10,8 @@ ratelgit은 worktree를 중심에 둔 macOS·Windows용 Git 클라이언트입�
 
 > AI와 함께 만들었습니다. 방향은 제가 정했고, 코드·테스트·문서는 [Codex](https://openai.com/codex/)와 [Claude Code](https://claude.com/claude-code)와의 세션에서 작성했습니다. [왜 만들었나](#왜-만들었나)를 참고하세요.
 
+**다운로드:** 서명·공증된 macOS 빌드(Apple Silicon·Intel)와 Windows x64 설치 파일은 [Releases 페이지](https://github.com/likeratel/ratelgit/releases/latest)에 있습니다. [설치](#설치)와 [빠른 시작](#빠른-시작)을 참고하세요.
+
 > **검증 상태.** macOS(Apple Silicon)에서 개발했습니다. Git 코어는 임시 저장소를 쓰는 통합 테스트로, UI는 단위 테스트와 브라우저 테스트로 확인합니다. Windows에서는 빌드와 테스트가 CI에서 통과하지만 앱을 실행해 보지는 못했습니다. [제한 사항](#제한-사항)을 참고하세요.
 
 ![worktree의 이력: 위에는 커밋 그래프, 아래에는 선택한 커밋의 메시지·파일·diff](docs/screenshots/history.png)

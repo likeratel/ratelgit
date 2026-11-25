@@ -10,6 +10,8 @@ ratelgit is a Git client built around worktrees, for macOS and Windows. Add your
 
 > Built with AI. I set the direction; the code, tests and docs were written in sessions with [Codex](https://openai.com/codex/) and [Claude Code](https://claude.com/claude-code). See [Why I built this](#why-i-built-this).
 
+**Download:** the signed and notarized macOS build (Apple Silicon and Intel) and the Windows x64 installers are on the [Releases page](https://github.com/likeratel/ratelgit/releases/latest). See [Install](#install) and [Quick start](#quick-start).
+
 > **Verification status.** Developed on macOS (Apple Silicon). The Git core is covered by integration tests against temporary repositories and the UI by unit and browser tests. On Windows the build and the tests pass in CI, but the app has not been run there. See [Limits](#limits).
 
 ![History of a worktree: the commit graph on top, the selected commit's message, files and diff below](docs/screenshots/history.png)
