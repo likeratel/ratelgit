@@ -1,7 +1,7 @@
 {
   "name": "ratelgit",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "description": "A Git client for moving quickly between projects and worktrees, built with Tauri 2, React, and Rust.",
   "repository": {
